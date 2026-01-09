@@ -1,32 +1,85 @@
-using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Text;
 
-var builder = WebApplication.CreateBuilder(args);
+namespace helios.identity.api {
+    public class Program {
+        public static void Main(string[] args) {
+            var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+            LoadAppsettings(builder);
 
-builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+            builder.Services.AddControllers();
+            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
 
-// Swagger (optional but recommended for dev)
-builder.Services.AddEndpointsApiExplorer();
-// builder.Services.AddSwaggerGen();
+            builder.Services.AddCors(options => {
+                options.AddPolicy("AllowAnyOrigin",
+                builder => {
+                    builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+                });
+            });
 
-var app = builder.Build();
+            var appSettings = builder.Configuration.GetSection("AppSettings").GetValue<string>("Secret");
+            var key = Encoding.ASCII.GetBytes(appSettings!);
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-	app.UseSwagger();
-	app.UseSwaggerUI();
+            // builder.Services.AddAuthentication(options => {
+            //     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            //     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            //     options.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
+            // })
+            //     .AddJwtBearer(options => {
+            //         options.RequireHttpsMetadata = false;
+            //         options.SaveToken = true;
+            //         options.TokenValidationParameters = new TokenValidationParameters {
+            //             ValidateIssuerSigningKey = true,
+            //             IssuerSigningKey = new SymmetricSecurityKey(key),
+            //             ValidateIssuer = false,
+            //             ValidateAudience = false
+            //         };
+            //     })
+            //     // Enable cookie-based authentication
+            //     .AddCookie();
+            var app = builder.Build();
+
+            // Error handling config for prod envs
+            if (!app.Environment.IsDevelopment()) {
+                app.UseExceptionHandler("/Home/Error");
+            }
+
+            app.UseSwagger(c =>
+            {
+                // This changes the JSON endpoint
+                c.RouteTemplate = "/swagger/{documentName}/swagger.json";
+            });
+
+            app.UseSwaggerUI(c =>
+            {
+                // This changes the UI path
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+
+                // Serve the UI at /swagger
+                c.RoutePrefix = "/swagger";
+            });
+
+            app.UseHttpsRedirection();
+            app.UseRouting();
+
+            app.UseCors("AllowAnyOrigin");
+
+            app.UseAuthentication();
+            app.UseAuthorization();
+
+            app.MapControllers();
+
+            app.Run();
+        }
+
+        private static WebApplicationBuilder LoadAppsettings(WebApplicationBuilder builder) {
+            builder.Configuration
+                .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json");
+
+            return builder;
+        }
+    }
 }
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-app.UseAuthentication();
-
-app.MapControllers();
-
-app.Run();

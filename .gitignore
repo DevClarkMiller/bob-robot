@@ -1,1 +1,4 @@
 api/obj
+api/bin
+api/appsettings.Development.json
+api/appsettings.Production.json
