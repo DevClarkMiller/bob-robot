@@ -1,0 +1,111 @@
+@Library('pipeline-lib') _
+
+pipeline {
+    agent any
+
+    parameters {
+        booleanParam(
+            name: 'All',
+            defaultValue: false,
+            description: 'Runs all steps'
+        )
+		
+		booleanParam(
+			name: 'Dev',
+			defaultValue: false,
+			description: 'Runs dev steps'
+		)
+
+		booleanParam(
+			name: 'Prod',
+			defaultValue: false,
+			description: 'Runs prod steps'
+		)
+
+		booleanParam(
+			name: 'Deploy',
+			defaultValue: true,
+			description: 'Runs deploy steps'
+		)
+    }
+
+    environment {
+        DIR = 'api'
+        USERNAME = credentials('vps-username')
+        DOMAIN = credentials('vps-domain')
+		API_APP_SETTINGS = 'bob.robot.api'
+		IMAGE_NAME = 'bob-robot'
+		DEV = 'Development'
+		PROD = 'Production'
+		HOST = 'miller@sys1.clarkmiller.ca'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Load secrets') {
+            when {
+				anyOf {
+					changeset "${DIR}/**"
+					expression { return params.All || params.Dev || params.Prod }	
+				}
+			}
+			steps {
+                dir(DIR) {
+                    loadAppsettings(IMAGE_NAME, DEV)
+                    loadAppsettings(IMAGE_NAME, PROD)
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            when {
+				anyOf {
+					changeset "${DIR}/**"
+					expression { return params.All || params.Dev || params.Prod }	
+				}
+			}
+			steps {
+                echo "Building Docker image for ${DIR}..."
+                    buildDockerImage('./api/Dockerfile', IMAGE_NAME, 'latest')
+            }
+        }
+
+        // DO THIS WHEN MULTIPLE SERVERS ARE PRESENT, ALSO FIND BETTER METHOD
+        // stage('Transfer docker image'){}
+
+        stage('Deploy Dev') {
+			when {
+				anyOf {
+					changeset "${DIR}/**"
+					expression { return params.All || params.Dev }
+				}
+			}
+            steps {
+				dir(DIR) { 
+					sh "scp docker-compose-dev.yml ${HOST}:/home/miller/bob-robot/dev/docker-compose.yml"
+                	sh "ssh ${HOST} \"cd bob-robot/dev && docker compose up -d\""
+				}
+            }
+        }
+
+		stage('Deploy Prod') {
+			when {
+				anyOf {
+					changeset "${DIR}/**"
+					expression { return params.All || params.Prod }
+				}
+			}
+            steps {
+				dir("${DIR}") { 
+					sh "scp docker-compose-prod.yml ${HOST}:/home/miller/bob-robot/prod/docker-compose.yml"
+                	sh "ssh ${HOST} \"cd bob-robot/prod && docker compose up -d\""
+				}
+            }
+        }
+    }
+}

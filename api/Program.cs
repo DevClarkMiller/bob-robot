@@ -1,4 +1,6 @@
-using Microsoft.AspNetCore.Authentication.Cookies;
+using BobRobotApi.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 namespace helios.identity.api {
@@ -23,23 +25,27 @@ namespace helios.identity.api {
             var appSettings = builder.Configuration.GetSection("AppSettings").GetValue<string>("Secret");
             var key = Encoding.ASCII.GetBytes(appSettings!);
 
-            // builder.Services.AddAuthentication(options => {
-            //     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            //     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            //     options.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
-            // })
-            //     .AddJwtBearer(options => {
-            //         options.RequireHttpsMetadata = false;
-            //         options.SaveToken = true;
-            //         options.TokenValidationParameters = new TokenValidationParameters {
-            //             ValidateIssuerSigningKey = true,
-            //             IssuerSigningKey = new SymmetricSecurityKey(key),
-            //             ValidateIssuer = false,
-            //             ValidateAudience = false
-            //         };
-            //     })
-            //     // Enable cookie-based authentication
-            //     .AddCookie();
+            builder.Services.AddAuthentication(options => {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+                .AddJwtBearer(options => {
+                    options.RequireHttpsMetadata = false;
+                    options.SaveToken = true;
+                    options.TokenValidationParameters = new TokenValidationParameters {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(key),
+                        ValidateIssuer = false,
+                        ValidateAudience = false
+                    };
+                })
+                // Enable cookie-based authentication
+                .AddCookie();
+
+			builder.Services.AddSingleton<ITokenService, TokenService>();
+			builder.Services.AddSingleton<IChatService, ChatService>();
+
             var app = builder.Build();
 
             // Error handling config for prod envs
@@ -59,7 +65,7 @@ namespace helios.identity.api {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
 
                 // Serve the UI at /swagger
-                c.RoutePrefix = "/swagger";
+                c.RoutePrefix = "";
             });
 
             app.UseHttpsRedirection();
