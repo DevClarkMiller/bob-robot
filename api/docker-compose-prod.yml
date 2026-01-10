@@ -3,8 +3,8 @@ services:
     image: bob-robot:latest
     container_name: prod-bob-robot
     ports:
-      - "6416:8080"
-      - "6417:8081"
+      - "6514:8080"
+      - "6515:8081"
     environment:
       ASPNETCORE_ENVIRONMENT: "Production"
     restart: unless-stopped
