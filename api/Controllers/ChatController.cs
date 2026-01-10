@@ -34,4 +34,22 @@ public class ChatController : ControllerBase
 		if (chat is null) return NotFound("No chats queued up");
 		return Ok(chat);
 	}
+
+	[HttpPost]
+	public async Task<IActionResult> SendChat(Guid unitGuid, string message) {
+		var claims = await _tokenService.GetClaims(HttpContext);
+		var role = _tokenService.GetRole(claims);
+
+		switch (role) {
+			case Constants.Roles.Admin: return BadRequest("Admins have no incoming chats");
+			case Constants.Roles.Chatter: 
+				_chatService.SendChatToChatter(unitGuid, message);
+				return Ok("Chat sent to Chatter");
+			case Constants.Roles.Unit:
+				_chatService.SendChatToUnit(unitGuid, message);
+				return Ok("Chat sent to Unit");
+			default:
+				return BadRequest("Unknown Role");
+		}
+	}
 }
