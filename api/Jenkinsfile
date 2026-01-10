@@ -30,7 +30,7 @@ pipeline {
     }
 
     environment {
-        DIR = 'api'
+        DIR = './'
         USERNAME = credentials('vps-username')
         DOMAIN = credentials('vps-domain')
 		API_APP_SETTINGS = 'bob-robot.api'
@@ -50,22 +50,20 @@ pipeline {
         stage('Load secrets') {
             when {
 				anyOf {
-					changeset "${DIR}/**"
+					changeset DIR
 					expression { return params.All || params.Dev || params.Prod }	
 				}
 			}
 			steps {
-                dir(DIR) {
-                    loadAppsettings(API_APP_SETTINGS, DEV)
-                    loadAppsettings(API_APP_SETTINGS, PROD)
-                }
+                loadAppsettings(API_APP_SETTINGS, DEV)
+				loadAppsettings(API_APP_SETTINGS, PROD)
             }
         }
 
         stage('Build Docker Image') {
             when {
 				anyOf {
-					changeset "${DIR}/**"
+					changeset DIR
 					expression { return params.All || params.Dev || params.Prod }	
 				}
 			}
@@ -81,30 +79,26 @@ pipeline {
         stage('Deploy Dev') {
 			when {
 				anyOf {
-					changeset "${DIR}/**"
+					changeset DIR
 					expression { return params.All || params.Dev }
 				}
 			}
             steps {
-				dir(DIR) { 
-					sh "scp docker-compose-dev.yml ${HOST}:/home/miller/bob-robot/dev/docker-compose.yml"
-                	sh "ssh ${HOST} \"cd bob-robot/dev && docker compose up -d\""
-				}
+				sh "scp docker-compose-dev.yml ${HOST}:/home/miller/bob-robot/dev/docker-compose.yml"
+				sh "ssh ${HOST} \"cd bob-robot/dev && docker compose up -d\""
             }
         }
 
 		stage('Deploy Prod') {
 			when {
 				anyOf {
-					changeset "${DIR}/**"
+					changeset DIR
 					expression { return params.All || params.Prod }
 				}
 			}
             steps {
-				dir("${DIR}") { 
-					sh "scp docker-compose-prod.yml ${HOST}:/home/miller/bob-robot/prod/docker-compose.yml"
-                	sh "ssh ${HOST} \"cd bob-robot/prod && docker compose up -d\""
-				}
+				sh "scp docker-compose-prod.yml ${HOST}:/home/miller/bob-robot/prod/docker-compose.yml"
+				sh "ssh ${HOST} \"cd bob-robot/prod && docker compose up -d\""
             }
         }
     }
