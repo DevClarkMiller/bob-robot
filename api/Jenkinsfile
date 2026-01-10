@@ -30,7 +30,7 @@ pipeline {
     }
 
     environment {
-        DIR = './'
+        DIR = 'api'
         USERNAME = credentials('vps-username')
         DOMAIN = credentials('vps-domain')
 		API_APP_SETTINGS = 'bob-robot.api'
@@ -50,27 +50,31 @@ pipeline {
         stage('Load secrets') {
             when {
 				anyOf {
-					changeset DIR
+					changeset "${DIR}/**"
 					expression { return params.All || params.Dev || params.Prod }	
 				}
 			}
 			steps {
-                loadAppsettings(API_APP_SETTINGS, DEV)
-				loadAppsettings(API_APP_SETTINGS, PROD)
+                dir(DIR) {
+                    loadAppsettings(API_APP_SETTINGS, DEV)
+                    loadAppsettings(API_APP_SETTINGS, PROD)
+                }
             }
         }
 
         stage('Build Docker Image') {
             when {
 				anyOf {
-					changeset DIR
+					changeset "${DIR}/**"
 					expression { return params.All || params.Dev || params.Prod }	
 				}
 			}
 			steps {
-                echo "Building Docker image for ${DIR}..."
-                    buildDockerImage('./api/Dockerfile', IMAGE_NAME, 'latest')
-            }
+				dir(DIR) {
+                	echo "Building Docker image for ${DIR}..."
+					buildDockerImage('./api/Dockerfile', IMAGE_NAME, 'latest')
+				}
+			}
         }
 
         // DO THIS WHEN MULTIPLE SERVERS ARE PRESENT, ALSO FIND BETTER METHOD
@@ -79,26 +83,30 @@ pipeline {
         stage('Deploy Dev') {
 			when {
 				anyOf {
-					changeset DIR
+					changeset "${DIR}/**"
 					expression { return params.All || params.Dev }
 				}
 			}
             steps {
-				sh "scp docker-compose-dev.yml ${HOST}:/home/miller/bob-robot/dev/docker-compose.yml"
-				sh "ssh ${HOST} \"cd bob-robot/dev && docker compose up -d\""
+				dir(DIR) { 
+					sh "scp docker-compose-dev.yml ${HOST}:/home/miller/bob-robot/dev/docker-compose.yml"
+                	sh "ssh ${HOST} \"cd bob-robot/dev && docker compose up -d\""
+				}
             }
         }
 
 		stage('Deploy Prod') {
 			when {
 				anyOf {
-					changeset DIR
+					changeset "${DIR}/**"
 					expression { return params.All || params.Prod }
 				}
 			}
             steps {
-				sh "scp docker-compose-prod.yml ${HOST}:/home/miller/bob-robot/prod/docker-compose.yml"
-				sh "ssh ${HOST} \"cd bob-robot/prod && docker compose up -d\""
+				dir("${DIR}") { 
+					sh "scp docker-compose-prod.yml ${HOST}:/home/miller/bob-robot/prod/docker-compose.yml"
+                	sh "ssh ${HOST} \"cd bob-robot/prod && docker compose up -d\""
+				}
             }
         }
     }
