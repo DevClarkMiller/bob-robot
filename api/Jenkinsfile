@@ -37,7 +37,7 @@ pipeline {
 		IMAGE_NAME = 'bob-robot'
 		DEV = 'Development'
 		PROD = 'Production'
-		HOST = 'miller@sys1.clarkmiller.ca'
+		HOST = 'miller@10.100.0.2'
     }
 
     stages {
