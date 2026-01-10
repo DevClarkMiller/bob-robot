@@ -33,7 +33,7 @@ pipeline {
         DIR = 'api'
         USERNAME = credentials('vps-username')
         DOMAIN = credentials('vps-domain')
-		API_APP_SETTINGS = 'bob.robot.api'
+		API_APP_SETTINGS = 'bob-robot.api'
 		IMAGE_NAME = 'bob-robot'
 		DEV = 'Development'
 		PROD = 'Production'
@@ -56,8 +56,8 @@ pipeline {
 			}
 			steps {
                 dir(DIR) {
-                    loadAppsettings(IMAGE_NAME, DEV)
-                    loadAppsettings(IMAGE_NAME, PROD)
+                    loadAppsettings(API_APP_SETTINGS, DEV)
+                    loadAppsettings(API_APP_SETTINGS, PROD)
                 }
             }
         }
