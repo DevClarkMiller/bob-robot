@@ -72,7 +72,7 @@ pipeline {
 			steps {
 				dir(DIR) {
                 	echo "Building Docker image for ${DIR}..."
-					buildDockerImage('./api/Dockerfile', IMAGE_NAME, 'latest')
+					buildDockerImage('Dockerfile', IMAGE_NAME, 'latest')
 				}
 			}
         }
