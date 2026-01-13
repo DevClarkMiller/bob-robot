@@ -2,6 +2,8 @@
 #include "State.hpp"
 #include "Context.hpp"
 
+using namespace global;
+
 void prompt(const char* msg) {
 	print_to_screen(msg);
 	delay(1000);
@@ -9,6 +11,7 @@ void prompt(const char* msg) {
 
 // TODO: SEND CREDENTIALS TO WIFI CHIP, CHECK IF SUCCESS, THEN STORE IN FLASH IF SO
 bool WifiInputState::transferCredentials() {
+	// Listen for response from wifi chip
 	return true; // PLACEHOLDER
 }
 

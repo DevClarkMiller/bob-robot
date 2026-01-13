@@ -16,4 +16,4 @@ enum CharacterLocation {
 };
 
 void init_characters();
-inline void print_character(CharacterLocation charLocation) { lcd.write(byte(charLocation)); }
+inline void print_character(CharacterLocation charLocation) { global::lcd.write(byte(charLocation)); }

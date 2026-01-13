@@ -2,6 +2,8 @@
 #include "State.hpp"
 #include "Context.hpp"
 
+using namespace global;
+
 void ReceiveState::onBackHold() {
 	ctx->setState(ctx->menuState);
 	ctx->start();

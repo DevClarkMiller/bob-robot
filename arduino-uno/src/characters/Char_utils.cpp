@@ -1,6 +1,8 @@
 #include "Global.hpp"
 #include "Characters.hpp"
 
+using namespace global;
+
 // Create each char for the LCD 
 void init_characters() {
 	lcd.createChar((int)CharacterLocation::Bell, bell);

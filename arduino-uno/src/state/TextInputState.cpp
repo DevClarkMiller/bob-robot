@@ -1,11 +1,16 @@
 #include "Global.hpp"
 #include "State.hpp"
 #include "Context.hpp"
+#include <Util.h>
+
+using namespace global;
 
 // Max of 32 characters per screen which is the total from each row
 #define MAX_SCREEN_CHAR_CNT 32
 
-String strInp;
+namespace global {
+	String strInp;
+}
 
 int TextInputState::getCurrCol() { return (cursorX / 16) % 2; }
 int TextInputState::getCurrPage() { return floor(cursorX / MAX_SCREEN_CHAR_CNT); }
@@ -77,7 +82,7 @@ void TextInputState::onBackHold() {
 }
 
 void TextInputState::onLeftClick() {
-	cursorX = wrap(cursorX - 1, getKeyArrSize());
+	cursorX = util::wrap(cursorX - 1, getKeyArrSize());
 	checkPage();
 }
 

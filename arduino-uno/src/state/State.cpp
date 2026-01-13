@@ -8,6 +8,8 @@ void State::onBackHold() {
 }
 
 void State::start() {
+	using namespace global;
+	
 	lcd.clear();
 	lcd.setCursor(0, 0);
 	lcd.noBlink();

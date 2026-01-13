@@ -82,6 +82,7 @@ void checkButtonInput(State* state, Context::ButtonState& buttonState, int pin, 
 }
 
 void Context::handle() {
+	using namespace global;
 	// Get inputs
 	checkButtonInput(state, backButtonState, INP_BACK_PIN, onBackClick, onBackHold, onBackDoubleClick);
 	checkButtonInput(state, leftButtonState, INP_LEFT_PIN, onLeftClick, onLeftHold, onLeftDoubleClick);

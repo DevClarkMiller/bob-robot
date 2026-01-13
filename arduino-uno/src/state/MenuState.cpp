@@ -2,6 +2,9 @@
 #include "State.hpp"
 #include "Context.hpp"
 #include "Characters.hpp"
+#include <Util.h>
+
+using namespace global;
 
 struct MenuOption {
 	State* state;
@@ -33,12 +36,12 @@ void MenuState::start() {
 }
 
 void MenuState::onLeftClick() {
-	cursorX = wrap(cursorX - 1, numMenuOpts());
+	cursorX = util::wrap(cursorX - 1, numMenuOpts());
 }
 
 void MenuState::onLeftHold() { cursorX = 0; }
 
-void MenuState::onActionClick() { 
+void MenuState::onActionClick() {
 	lcd.clear();
 	lcd.setCursor(0, 0);
 	lcd.noBlink();

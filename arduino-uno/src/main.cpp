@@ -12,6 +12,8 @@ MessageInputState messageInputState;
 MenuState menuState;
 Context context(&receiveState, &printState, &wifiInputState, &textInputState, &messageInputState, &menuState);
 
+using namespace global;
+
 void setup(){
 	Serial.begin(9600);
 		
@@ -31,7 +33,7 @@ void setup(){
 
 	lcd.setCursor(0, 0);
 	lcd.print("Waiting...");
-	make_ready();
+	makeReadyToReceive();
 	delay(150);
 
 	context.state->start();

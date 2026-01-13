@@ -2,6 +2,8 @@
 #include "State.hpp"
 #include "Context.hpp"
 
+using namespace global;
+
 // TODO: Send message over wifi chip
 void MessageInputState::sendMessage() {
 	print_to_screen("Sent message!");
