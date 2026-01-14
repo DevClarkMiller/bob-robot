@@ -1,4 +1,5 @@
 #pragma once
+#include <Global.h>
 #include <Chat.h>
 #include <Io.h>
 
@@ -8,19 +9,25 @@ namespace chat {
 	struct ChatConfig {
 		char url[URL_BUFF_SIZE];
 		char bearerToken[BEARER_TOKEN_SIZE];
+		char unitGuid[global::UNIT_NUMBER_BUFF_SIZE];
 		bool isUrlSecure;
 	};
 
 	struct ChatConfigData: io::StoredData { 
 		char url[URL_BUFF_SIZE];
 		char bearerToken[BEARER_TOKEN_SIZE];
-		bool isUrlSecure;
+		char unitGuid[global::UNIT_NUMBER_BUFF_SIZE];
 	};
 
-	extern ChatConfig chatConfig;
+	extern ChatConfig config;
 
 	bool canPoll();
 	void poll(bool log);
 	void send(bool log);
 	void initAPI();
+
+	bool isConfigValid();
+
+	bool initConfigFromStorage();
+	void writeConfigToStorage();
 }

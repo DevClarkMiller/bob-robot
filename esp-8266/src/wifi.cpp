@@ -47,7 +47,8 @@ namespace wifi {
 
 	bool initCredsFromStorage() {
 		WifiCredentialsData rawCreds;
-		EEPROM.get(0, rawCreds); // TODO: FETCH POS FROM STORAGE
+		size_t storageAddr = io::getStoredDataAddr("WifiCredentials");
+		EEPROM.get(storageAddr, rawCreds);
 
 		if (!rawCreds.isStored()) return false;
 
@@ -63,7 +64,8 @@ namespace wifi {
 		strcpy(rawCreds.ssid, creds.ssid);
 		strcpy(rawCreds.passwd, creds.passwd);
 
-		EEPROM.put(0, rawCreds);
+		size_t storageAddr = io::getStoredDataAddr("WifiCredentials");
+		EEPROM.put(storageAddr, rawCreds);
 		EEPROM.commit();
 	}
 }

@@ -23,4 +23,25 @@ namespace command {
 
 		return nullptr;
 	}
+
+	void parseCommand(char* buffer, char* cmdNameBuff) {
+		// Find the first delim or end of string
+		size_t i = 0;
+		while (buffer[i] != CMD_DELIM && buffer[i] != '\0' && i < CMD_NAME_BUFF_SIZE - 1) {
+			cmdNameBuff[i] = buffer[i];
+			i++;
+		}
+		cmdNameBuff[i] = '\0';
+
+		// Skip ' ' and ':' (if any)
+		size_t j = i;
+		if (buffer[j] == ' ' || buffer[j] == CMD_DELIM) j++;
+
+		// Shift the rest of the buffer left
+		size_t k = 0;
+		while (j < CMD_BUFF_SIZE && buffer[j] != '\0') {
+			buffer[k++] = buffer[j++];
+		}
+		buffer[k] = '\0';
+	}
 }

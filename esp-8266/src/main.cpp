@@ -16,23 +16,11 @@ using namespace io;
 // 1. ChatConfig
 // 2. WifiCredentials
 
-// TODO: THINK OF WAY TO FIND INDEX OF THESE EASILY
-
-size_t initStoredDataAddresses() {
-	size_t dataSizes[] = {
-		sizeof(chat::ChatConfigData),
-		sizeof(wifi::WifiCredentialsData)
+namespace io {
+	StoredDataInfo storedDataInfoArr [] = {
+		{ sizeof(chat::ChatConfigData), "ChatConfig" },
+		{ sizeof(wifi::WifiCredentialsData), "WifiCredentials" }
 	};
-	
-	int n = sizeof(dataSizes) / sizeof(dataSizes[0]);
-	
-	storedDataAddrArr[0] = 0;
-	for (int i = 1; i < n && i < STORED_DATA_ADDR_ARR_SIZE; i++) {
-		storedDataAddrArr[i] = storedDataAddrArr[i - 1] + dataSizes[i - 1];
-	}
-
-	// Return the total size needed for EEPROM
-	return storedDataAddrArr[n - 1] + dataSizes[n - 1];
 }
 
 void initStorage() {
@@ -48,9 +36,10 @@ void setup() {
 
 	initStorage();
 
-	// if (wifi::initCredsFromStorage()) wifi::connect(wifi::creds.ssid, wifi::creds.passwd, LOGGING);
+	if (wifi::initCredsFromStorage()) wifi::connect(wifi::creds.ssid, wifi::creds.passwd, LOGGING);
+	chat::initAPI();
 
-	// chat::initAPI();
+	// TODO: LOAD CHAT FROM STORAGE
 
 	wifi::secureClient.setInsecure(); // WARNING: Insecure, for testing only
 	lastPollTime = millis();

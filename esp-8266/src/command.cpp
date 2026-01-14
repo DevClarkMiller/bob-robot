@@ -4,12 +4,7 @@
 #include "chat.hpp"
 
 namespace command {
-	void wifiStat() { sendCommand("WIFI_STAT", wifi::creds.connected ? "1" : "0"); }
-
-	void wifiStatWrapper(char buffer[CMD_BUFF_SIZE]) {
-		(void)buffer; // To surpress unsed warnings
-		wifiStat();
-	}
+	void wifiStat(char buffer[CMD_BUFF_SIZE]) { sendCommand("WIFI_STAT", wifi::creds.connected ? "1" : "0"); }
 
 	void setCredentials(char buffer[CMD_BUFF_SIZE]) {
 		using namespace wifi;
@@ -37,46 +32,38 @@ namespace command {
 		} else sendCommand(cmdName, "0");
 	}
 
-	void setToken(char buffer[CMD_BUFF_SIZE]) { 
-		sendCommand("TOKEN", buffer);
-	}
+	void setToken(char buffer[CMD_BUFF_SIZE]) { strcpy(chat::config.bearerToken, buffer); }
+	void getToken(char buffer[CMD_BUFF_SIZE]) { sendCommand("TOKEN", chat::config.bearerToken); }; 
 
-	void setUnitGuid(char buffer[CMD_BUFF_SIZE]) {
-		sendCommand("UNIT_GUID", buffer);
-	}
+	void setUnitGuid(char buffer[CMD_BUFF_SIZE]) { strcpy(chat::config.unitGuid, buffer); }
+	void getUnitGuid(char buffer[CMD_BUFF_SIZE]) { sendCommand("TOKEN", chat::config.unitGuid); }
 
-	// Removes the name of the cmd from the buffer and puts it into its own
-	void parseCmd(char* buffer, char* cmdNameBuff) {
-		// Find the first delim or end of string
-		size_t i = 0;
-		while (buffer[i] != CMD_DELIM && buffer[i] != '\0' && i < CMD_NAME_BUFF_SIZE - 1) {
-			cmdNameBuff[i] = buffer[i];
-			i++;
+	void saveChatConfig(char buffer[CMD_BUFF_SIZE]) {
+		using namespace chat;
+
+		if (!isConfigValid()) { 
+			sendCommand("CHAT_CONFIG_INVALID", "1");
+			return;
 		}
-		cmdNameBuff[i] = '\0';
+	
+		writeConfigToStorage();
 
-		// Skip ' ' and ':' (if any)
-		size_t j = i;
-		if (buffer[j] == ' ' || buffer[j] == CMD_DELIM) j++;
-
-		// Shift the rest of the buffer left
-		size_t k = 0;
-		while (j < CMD_BUFF_SIZE && buffer[j] != '\0') {
-			buffer[k++] = buffer[j++];
-		}
-		buffer[k] = '\0';
+		sendCommand("CHAT_SAVED", "1");
 	}
 
 	const Command COMMANDS[] = {
 		{"SET_WIFI_CREDS", setCredentials},
-		{"WIFI_STAT", wifiStatWrapper},
+		{"WIFI_STAT", wifiStat},
 		{"SET_TOKEN", setToken},
-		{"SET_UNIT_GUID", setUnitGuid}
+		{"GET_TOKEN", getToken},
+		{"SET_UNIT_GUID", setUnitGuid},
+		{"GET_UNIT_GUID", getUnitGuid},
+		{"SAVE_CHAT_CONFIG", saveChatConfig}
 	};
 
 	void handleCommand(char buffer[CMD_BUFF_SIZE]) {
 		char cmdNameBuff[CMD_NAME_BUFF_SIZE];
-		parseCmd(buffer, cmdNameBuff);
+		parseCommand(buffer, cmdNameBuff);
 
 		int n = sizeof(COMMANDS) / sizeof(Command);
 		const Command* cmd = command::getCommand(cmdNameBuff, COMMANDS, n);

@@ -5,7 +5,7 @@
 namespace chat {	
 	const char* API_URL = "http://192.168.1.203:6512";
 
-	ChatConfig chatConfig;
+	ChatConfig config;
 
 	bool isApiInit = false;
 
@@ -13,7 +13,7 @@ namespace chat {
 	void initAPI() {
 		// snprintf(url, sizeof(url), "%s/Chat?unitGuid=%s", API_URL, UNIT_GUID);
 		// snprintf(bearerToken, sizeof(bearerToken), "Bearer %s", API_TOKEN);
-		chatConfig.isUrlSecure = wifi::isUrlSecured(chatConfig.url);
+		config.isUrlSecure = wifi::isUrlSecured(config.url);
 	}
 
 	// TODO: STORE STATE ON ARDUINO, INCLUDING IF ITS SENT THE SIG THAT ITS READY TO RECEIVE
@@ -29,8 +29,8 @@ namespace chat {
 			isApiInit = true;
 		}
 
-		if (wifi::beginHttp(http, chatConfig.url, chatConfig.isUrlSecure)) {
-			http.addHeader("Authorization", chatConfig.bearerToken);
+		if (wifi::beginHttp(http, config.url, config.isUrlSecure)) {
+			http.addHeader("Authorization", config.bearerToken);
 			int httpCode = http.GET();
 
 			if (httpCode > 0) {
@@ -49,5 +49,38 @@ namespace chat {
 
 	void send() {
 		
+	}
+
+	bool isConfigValid() {
+		return config.url[0] != '\0' && 
+			config.bearerToken[0] != '\0' && 
+			config.unitGuid[0] != '\0';
+	}
+
+	bool initConfigFromStorage() {
+		ChatConfigData configData;
+		size_t storageAddr = io::getStoredDataAddr("ChatConfig");
+		EEPROM.get(storageAddr, configData);
+
+		if (!configData.isStored()) return false;
+
+		strcpy(config.bearerToken, configData.bearerToken);
+		strcpy(config.url, configData.url);
+		strcpy(config.unitGuid, configData.unitGuid);
+
+		return true;
+	}
+
+	void writeConfigToStorage() {
+		ChatConfigData configData;
+		configData.init();
+
+		strcpy(configData.bearerToken, config.bearerToken);
+		strcpy(configData.url, config.url);
+		strcpy(configData.unitGuid, config.unitGuid);
+
+		size_t storageAddr = io::getStoredDataAddr("ChatConfig");
+		EEPROM.put(storageAddr, configData);
+		EEPROM.commit();
 	}
 }

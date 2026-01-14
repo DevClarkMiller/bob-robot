@@ -4,7 +4,7 @@
 #include <Util.h>
 
 namespace io {
-	size_t storedDataAddrArr[STORED_DATA_ADDR_ARR_SIZE];
+	size_t storedDataAddrArr[STORED_DATA_SIZE];
 
 	bool StoredData::isStored() { return magic == RAW_DATA_HEALTH_ID; }
 	void StoredData::init() { magic = RAW_DATA_HEALTH_ID; }
@@ -21,9 +21,7 @@ namespace io {
 		if (Serial.available() == 0) return;
 		
 		char firstChar = Serial.peek(); // Peek at the first character without removing it
-
-		Serial.println("INPUT");
-		
+				
 		bool isCmd = firstChar == CMD_START_SYM; 
 
 		if (isCmd) {
@@ -34,9 +32,28 @@ namespace io {
 			handleCommand(buffer);
 		} else {
 			Serial.println("Data received isn't a CMD");
-			util::clearSerial();
+			Serial.println(Serial.readString());
 		}
 
 		// TODO: Handle other input types
+	}
+
+	size_t getStoredDataAddr(const char* name) {
+		for (int i = 0; i < STORED_DATA_SIZE; i++) {
+			StoredDataInfo& storedDataInfo = storedDataInfoArr[i];
+			if (strcmp(storedDataInfo.name, name) == 0) return storedDataAddrArr[i];
+		}
+
+		return -1;
+	}
+
+	size_t initStoredDataAddresses() {		
+		storedDataAddrArr[0] = 0;
+		for (int i = 1; i < STORED_DATA_SIZE && i < STORED_DATA_SIZE; i++) {
+			storedDataAddrArr[i] = storedDataAddrArr[i - 1] + storedDataInfoArr[i - 1].size;
+		}
+
+		// Return the total size needed for EEPROM
+		return storedDataAddrArr[STORED_DATA_SIZE - 1] + storedDataInfoArr[STORED_DATA_SIZE - 1].size;
 	}
 }
