@@ -6,4 +6,5 @@ namespace util {
 	void trim(char* str);
 
 	inline int wrap(int val, int max) { return (val % max + max) % max; }
+	void clearSerial();
 }

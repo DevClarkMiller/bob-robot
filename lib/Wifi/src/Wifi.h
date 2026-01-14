@@ -1,8 +1,8 @@
 #pragma once
-#include <cstddef>
+#include <stddef.h>
 
 namespace wifi {
-	constexpr std::size_t WIFI_TIMEOUT = 10000;
+	constexpr size_t WIFI_TIMEOUT = 10000;
 	constexpr int SSID_BUFF_SIZE = 34;
 	constexpr int PASSWD_BUFF_SIZE = 65;
 

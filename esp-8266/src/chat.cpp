@@ -5,9 +5,7 @@
 namespace chat {	
 	const char* API_URL = "http://192.168.1.203:6512";
 
-	char url[256];
-	char bearerToken[512];
-	bool isUrlSecure;
+	ChatConfig chatConfig;
 
 	bool isApiInit = false;
 
@@ -15,7 +13,7 @@ namespace chat {
 	void initAPI() {
 		// snprintf(url, sizeof(url), "%s/Chat?unitGuid=%s", API_URL, UNIT_GUID);
 		// snprintf(bearerToken, sizeof(bearerToken), "Bearer %s", API_TOKEN);
-		isUrlSecure = wifi::isUrlSecured(url);
+		chatConfig.isUrlSecure = wifi::isUrlSecured(chatConfig.url);
 	}
 
 	// TODO: STORE STATE ON ARDUINO, INCLUDING IF ITS SENT THE SIG THAT ITS READY TO RECEIVE
@@ -31,8 +29,8 @@ namespace chat {
 			isApiInit = true;
 		}
 
-		if (wifi::beginHttp(http, url, isUrlSecure)) {
-			http.addHeader("Authorization", bearerToken);
+		if (wifi::beginHttp(http, chatConfig.url, chatConfig.isUrlSecure)) {
+			http.addHeader("Authorization", chatConfig.bearerToken);
 			int httpCode = http.GET();
 
 			if (httpCode > 0) {

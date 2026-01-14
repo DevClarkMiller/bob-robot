@@ -1,28 +1,26 @@
 import serial, time, argparse, threading
 
+LAST_ACT_MS_THRESHOLD = 1500 # 
+
 port = None
 baud = None
 quit_event = threading.Event()
 arduino = None
 
-def get_serial(com, baud):
-    return serial.Serial(port=com,  baudrate=baud, timeout=.1)
+def stop(): quit_event.set()
 
-def read():
+def get_serial(com, baud):
+    return serial.Serial(port=com, baudrate=baud, timeout=.1)
+
+def read(encoding = 'utf-8'):
     data = arduino.readline()
     try:
-        return data.decode('utf-8').strip()
+        decoded = data.decode(encoding).strip()
+        return decoded if decoded else None
     except:
-        return data
+        return None
 
 def write(msg): 
-    # while True:
-    #     state = read()
-
-    #     if state == '': continue
-    #     elif state == '$READY:1': break
-    #     return False
-
     arduino.write(msg.encode())
     print(f"[Client] {msg}")
     return True
@@ -33,23 +31,26 @@ def writeSerial():
         try:
             msg = input("Enter message or enter 'exit' to quit: ")
             if msg == "exit":
-                quit_event.set()
+                stop()
                 break
             write(msg)
         except Exception as e:
             print(e)
-            quit_event.set()
+            stop()
 
 def readSerial():
     global quit_event
     while not quit_event.is_set():
         try:
             msg = read()
-            if msg: 
-                print(f"[{port}] {msg}")
+            if msg: print(f"[{port}] {msg}")
+            time.sleep(0.25)
         except Exception as e:
             print(e)
-            quit_event.set()
+            stop()
+
+def millis():
+    return time.time_ns() // 1_000_000
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Testing client for bob the robots receiver")

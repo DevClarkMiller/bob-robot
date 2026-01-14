@@ -46,10 +46,8 @@ namespace wifi {
 	}
 
 	bool initCredsFromStorage() {
-		EEPROM.begin(512);
-
 		WifiCredentialsData rawCreds;
-		EEPROM.get(0, rawCreds);
+		EEPROM.get(0, rawCreds); // TODO: FETCH POS FROM STORAGE
 
 		if (!rawCreds.isStored()) return false;
 
@@ -65,7 +63,6 @@ namespace wifi {
 		strcpy(rawCreds.ssid, creds.ssid);
 		strcpy(rawCreds.passwd, creds.passwd);
 
-		EEPROM.begin(512); // or larger if needed
 		EEPROM.put(0, rawCreds);
 		EEPROM.commit();
 	}

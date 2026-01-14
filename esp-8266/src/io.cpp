@@ -1,6 +1,7 @@
 #include "globals.hpp"
 #include "io.hpp"
 #include "command.hpp"
+#include <Util.h>
 
 namespace io {
 	size_t storedDataAddrArr[STORED_DATA_ADDR_ARR_SIZE];
@@ -9,13 +10,9 @@ namespace io {
 	void StoredData::init() { magic = RAW_DATA_HEALTH_ID; }
 
 	void copySerialInfoBuffer(char* buffer, size_t buffsize) {
-		int i = 0;
-		while (Serial.available() > 0 && i < (int)buffsize - 1) {
-			char c = Serial.read();
-			if (c == '\n' || c == '\r') break;
-			buffer[i++] = c;
-		}
-		buffer[i] = '\0'; // Null-terminate
+		size_t len = Serial.readBytesUntil('\n', buffer, buffsize - 1);
+		buffer[len] = '\0';
+		if (len > 0 && buffer[len - 1] == '\r') buffer[len - 1] = '\0';
 	}
 
 	void handleInput() {
@@ -24,18 +21,22 @@ namespace io {
 		if (Serial.available() == 0) return;
 		
 		char firstChar = Serial.peek(); // Peek at the first character without removing it
-		Serial.println(firstChar);
-		// if (firstChar != CMD_START_SYM) return; // Simply return for now
 
-		// Serial.println("Command start detected");
-
-		// Serial.read(); // Remove first char
-		// char buffer[CMD_BUFF_SIZE];
-		// copySerialInfoBuffer(buffer, CMD_BUFF_SIZE);
+		Serial.println("INPUT");
 		
-		// handleCommand(buffer);
-		return;
+		bool isCmd = firstChar == CMD_START_SYM; 
 
-		// Handle other input types
+		if (isCmd) {
+			Serial.read(); // Remove first char
+			
+			char buffer[CMD_BUFF_SIZE];
+			copySerialInfoBuffer(buffer, CMD_BUFF_SIZE);
+			handleCommand(buffer);
+		} else {
+			Serial.println("Data received isn't a CMD");
+			util::clearSerial();
+		}
+
+		// TODO: Handle other input types
 	}
 }

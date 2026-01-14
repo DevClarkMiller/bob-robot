@@ -1,12 +1,23 @@
 #pragma once
 #include <Chat.h>
+#include <Io.h>
 
 namespace chat {
 	constexpr size_t POLL_INTERVAL = 5000;
+	
+	struct ChatConfig {
+		char url[URL_BUFF_SIZE];
+		char bearerToken[BEARER_TOKEN_SIZE];
+		bool isUrlSecure;
+	};
 
-	extern char url[URL_BUFF_SIZE];
-	extern char bearerToken[BEARER_TOKEN_SIZE];
-	extern bool isUrlSecure;
+	struct ChatConfigData: io::StoredData { 
+		char url[URL_BUFF_SIZE];
+		char bearerToken[BEARER_TOKEN_SIZE];
+		bool isUrlSecure;
+	};
+
+	extern ChatConfig chatConfig;
 
 	bool canPoll();
 	void poll(bool log);

@@ -7,11 +7,9 @@
 #include "io.hpp"
 
 namespace wifi {
-	struct WifiCredentialsData : io::StoredData {
+	struct WifiCredentialsData: io::StoredData {
 		char ssid[34];
 		char passwd[65];
-
-		int getInfoArrIdx() const override;
 	};
 
 	extern WifiCredentials creds;

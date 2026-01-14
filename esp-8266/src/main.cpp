@@ -13,19 +13,14 @@ unsigned long lastPollTime;
 using namespace io;
 
 // Order of stored items goes 
-// 1. UnitGuid
-// 2. BearerToken
-// 3. WifiCredentials
+// 1. ChatConfig
+// 2. WifiCredentials
 
-struct UnitGuidData: StoredData { int getInfoArrIdx() const override { return 1; } };
-struct BearerTokenData: StoredData { int getInfoArrIdx() const override { return 2; } };
-
-int wifi::WifiCredentialsData::getInfoArrIdx() const { return 3; }
+// TODO: THINK OF WAY TO FIND INDEX OF THESE EASILY
 
 size_t initStoredDataAddresses() {
 	size_t dataSizes[] = {
-		sizeof(UnitGuidData),
-		sizeof(BearerTokenData),
+		sizeof(chat::ChatConfigData),
 		sizeof(wifi::WifiCredentialsData)
 	};
 	
@@ -46,23 +41,25 @@ void initStorage() {
 }
 
 void setup() {
-	using namespace wifi;
-
 	Serial.begin(global::BAUD_RATE);
 	delay(250);
 
+	Serial.println("Starting ESP-8266...");
+
 	initStorage();
 
-	if (initCredsFromStorage()) connect(creds.ssid, creds.passwd, LOGGING);
+	// if (wifi::initCredsFromStorage()) wifi::connect(wifi::creds.ssid, wifi::creds.passwd, LOGGING);
 
-	chat::initAPI();
+	// chat::initAPI();
 
-	secureClient.setInsecure(); // WARNING: Insecure, for testing only
+	wifi::secureClient.setInsecure(); // WARNING: Insecure, for testing only
 	lastPollTime = millis();
+	Serial.println("Finished Setup");
 }
 
 void loop() {
 	handleInput();
+	delay(1);
 	if (chat::canPoll() && millis() - lastPollTime > chat::POLL_INTERVAL) {
 		chat::poll(LOGGING);
 		lastPollTime = millis();

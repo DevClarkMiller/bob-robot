@@ -4,7 +4,12 @@
 #include "chat.hpp"
 
 namespace command {
-	void isConnected() { sendCommand("WIFI_STAT", wifi::creds.connected ? "1" : "0"); }
+	void wifiStat() { sendCommand("WIFI_STAT", wifi::creds.connected ? "1" : "0"); }
+
+	void wifiStatWrapper(char buffer[CMD_BUFF_SIZE]) {
+		(void)buffer; // To surpress unsed warnings
+		wifiStat();
+	}
 
 	void setCredentials(char buffer[CMD_BUFF_SIZE]) {
 		using namespace wifi;
@@ -33,40 +38,49 @@ namespace command {
 	}
 
 	void setToken(char buffer[CMD_BUFF_SIZE]) { 
-
+		sendCommand("TOKEN", buffer);
 	}
 
-	void setUnitNumber(char buffer[CMD_BUFF_SIZE]) {
-
+	void setUnitGuid(char buffer[CMD_BUFF_SIZE]) {
+		sendCommand("UNIT_GUID", buffer);
 	}
 
 	// Removes the name of the cmd from the buffer and puts it into its own
-	void parseCmd(char* buffer, size_t buffsize, char* cmdNameBuff, size_t cmdNameBufSize) {
+	void parseCmd(char* buffer, char* cmdNameBuff) {
 		// Find the first delim or end of string
 		size_t i = 0;
-		while (buffer[i] != CMD_DELIM && buffer[i] != '\0' && i < cmdNameBufSize - 1) {
+		while (buffer[i] != CMD_DELIM && buffer[i] != '\0' && i < CMD_NAME_BUFF_SIZE - 1) {
 			cmdNameBuff[i] = buffer[i];
 			i++;
 		}
 		cmdNameBuff[i] = '\0';
 
-		// Skip the space (if any)
+		// Skip ' ' and ':' (if any)
 		size_t j = i;
-		if (buffer[j] == ' ') j++;
+		if (buffer[j] == ' ' || buffer[j] == CMD_DELIM) j++;
 
 		// Shift the rest of the buffer left
 		size_t k = 0;
-		while (j < buffsize && buffer[j] != '\0') {
+		while (j < CMD_BUFF_SIZE && buffer[j] != '\0') {
 			buffer[k++] = buffer[j++];
 		}
 		buffer[k] = '\0';
 	}
 
+	const Command COMMANDS[] = {
+		{"SET_WIFI_CREDS", setCredentials},
+		{"WIFI_STAT", wifiStatWrapper},
+		{"SET_TOKEN", setToken},
+		{"SET_UNIT_GUID", setUnitGuid}
+	};
+
 	void handleCommand(char buffer[CMD_BUFF_SIZE]) {
 		char cmdNameBuff[CMD_NAME_BUFF_SIZE];
+		parseCmd(buffer, cmdNameBuff);
 
-		parseCmd(buffer, CMD_BUFF_SIZE, cmdNameBuff, CMD_NAME_BUFF_SIZE);
-		if (strcmp(cmdNameBuff, "SET_WIFI_CREDS") == 0) setCredentials(buffer);
-		else if (strcmp(cmdNameBuff, "WIFI_STAT") == 0) isConnected();
+		int n = sizeof(COMMANDS) / sizeof(Command);
+		const Command* cmd = command::getCommand(cmdNameBuff, COMMANDS, n);
+		if (cmd != nullptr) cmd->handler(buffer);
+		else sendCommand("CMD_404", "1");
 	}
 }

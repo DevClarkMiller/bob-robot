@@ -5,7 +5,7 @@
 namespace io {
 	// Max of 12 things are being stored in flash
 	constexpr int STORED_DATA_ADDR_ARR_SIZE = 12;
-	constexpr std::size_t RAW_DATA_HEALTH_ID = 0xDEADBEEF;
+	constexpr size_t RAW_DATA_HEALTH_ID = 0xDEADBEEF;
 
 	void handleInput();
 
