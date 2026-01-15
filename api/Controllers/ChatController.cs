@@ -36,7 +36,7 @@ public class ChatController : ControllerBase
 	}
 
 	[HttpPost]
-	public async Task<IActionResult> SendChat(Guid unitGuid, string message) {
+	public async Task<IActionResult> SendChat([FromQuery]Guid unitGuid, [FromQuery]string message) {
 		var claims = await _tokenService.GetClaims(HttpContext);
 		var role = _tokenService.GetRole(claims);
 

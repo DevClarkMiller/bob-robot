@@ -21,13 +21,11 @@ namespace chat {
 		char unitGuid[global::UNIT_NUMBER_BUFF_SIZE];
 	};
 
-extern unsigned long lastPollTime;
 	extern ChatConfig config;
 
 	bool canPoll();
-	void poll(bool log);
-	void send(bool log);
-	bool initAPI();
+	void poll();
+	void send(char buffer[URL_BUFF_SIZE]);
 
 	bool isConfigValid();
 

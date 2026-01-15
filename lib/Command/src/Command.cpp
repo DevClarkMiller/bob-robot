@@ -15,6 +15,8 @@ namespace command {
 		Serial.println(buffer); // Finally send the finished buffer over serial
 	}
 
+	void sendCommand(const char* cmdName) { sendCommand(cmdName, "1"); }
+
 	const Command* getCommand(const char* cmdName, const Command* commands, int n) {
 		for (int i = 0; i < n; i++) {
 			const Command* cmd = &commands[i];

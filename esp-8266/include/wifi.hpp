@@ -4,6 +4,7 @@
 #include <WiFiClientSecure.h>
 #include <Wifi.h>
 #include <Command.h>
+#include <Chat.h>
 
 #include "io.hpp"
 
@@ -21,7 +22,7 @@ namespace wifi {
 		const uint8_t* body = nullptr;
 		size_t bodySize;
 
-		char* token = nullptr;
+		char token[chat::BEARER_TOKEN_SIZE];
 		size_t tokenSize;
 
 		bool isAuthorized = false;
@@ -53,5 +54,8 @@ namespace wifi {
 
 	bool initCredsFromStorage();
 	void writeCredsToStorage();
-	void setCredentials(char buffer[command::CMD_BUFF_SIZE]);
+	void saveCredentials(char buffer[command::CMD_BUFF_SIZE]);
+
+	void setSSID(char buffer[command::CMD_BUFF_SIZE]);
+	void setPASSWD(char buffer[command::CMD_BUFF_SIZE]);
 }

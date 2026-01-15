@@ -15,6 +15,7 @@ namespace command {
 	};
 
 	void sendCommand(const char* cmdName, const char* payload);
+	void sendCommand(const char* cmdName);
 	const Command* getCommand(const char* cmdName, const Command* commands, int n);
 
 	void parseCommand(char* buffer, char* cmdNameBuff);

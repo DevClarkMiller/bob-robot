@@ -11,7 +11,10 @@ public:
 		unsigned long lastClickTime = 0;
 	};
 
+	// The main state
 	State* state;
+	// Handles receiving input from serial and its handle method is called every loop along with the other states context
+	State* receiverState; 
 
 	ReceiveState* receiveState;
 	PrintState* printState;

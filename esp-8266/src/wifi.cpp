@@ -1,6 +1,8 @@
-#include "wifi.hpp"
-#include "globals.hpp"
 #include "EEPROM.h"
+#include "wifi.hpp"
+#include "chat.hpp"
+#include "globals.hpp"
+
 
 namespace wifi {
 	WifiCredentials creds;
@@ -69,25 +71,9 @@ namespace wifi {
 		EEPROM.commit();
 	}
 
-	void setCredentials(char buffer[command::CMD_BUFF_SIZE]) {
+	void saveCredentials(char buffer[command::CMD_BUFF_SIZE]) {
 		using namespace wifi;
 		const char* cmdName = "WIFI_STAT";
-
-		// Pull ssid and passwd buffers from the buffer since we already know their exact size
-		char ssidBuff[SSID_BUFF_SIZE];
-		char passwdBuff[PASSWD_BUFF_SIZE];
-
-		int j = 0;
-		// Copy over the ssid
-		for (int i = 0; i < SSID_BUFF_SIZE; i++) 
-			ssidBuff[i] = buffer[j++];
-
-		for (int i = 0; i < PASSWD_BUFF_SIZE; i++) 
-			passwdBuff[i] = buffer[j++];
-
-		// Copy over the passwd
-		strcpy(creds.ssid, ssidBuff);
-		strcpy(creds.passwd, passwdBuff);
 
 		if (connect(LOGGING)) {
 			writeCredsToStorage(); // Only actually save the creds if they're valid
@@ -115,14 +101,20 @@ namespace wifi {
 		}
 	}
 
+	void initAuth(HTTPClient& http, const char* token) {
+		char tokenCpy[chat::BEARER_TOKEN_SIZE];  // Local buffer on stack
+		sprintf(tokenCpy, "Bearer %s", token);
+		http.addHeader("Authorization", tokenCpy);
+	}
+
 	void request(RequestType requestType, const char* url, const RequestOptions* options, RequestCallback onSuccess, RequestCallback onError) {
 		HTTPClient http;
 
-		if (wifi::beginHttp(http, url, options->isUrlSecure)) {
-			if (options->isAuthorized) http.addHeader("Authorization", options->token);
+		if (beginHttp(http, url, options->isUrlSecure)) {
+			if (options->isAuthorized) initAuth(http, options->token);
 			int httpCode = sendRequest(http, requestType, options->body, options->bodySize);
 
-			if (httpCode > 0) {
+			if (httpCode > 0 && httpCode < 400) {
 				if (onSuccess != nullptr) onSuccess(http, httpCode);
 			} else if (httpCode <= 0 || httpCode >= 400) {
 				if (onError != nullptr) onError(http, httpCode);
@@ -131,5 +123,13 @@ namespace wifi {
 		} else {
 			if (LOGGING) Serial.println("Unable to connect to server");
 		}
+	}
+
+	void setSSID(char buffer[command::CMD_BUFF_SIZE]) {
+		strcpy(creds.ssid, buffer);
+	}
+
+	void setPASSWD(char buffer[command::CMD_BUFF_SIZE]) {
+		strcpy(creds.passwd, buffer);
 	}
 }

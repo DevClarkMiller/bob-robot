@@ -1,6 +1,7 @@
 #include "Global.hpp"
 #include "Context.hpp"
 #include "Characters.hpp"
+#include "Command.hpp"
 
 String msg;
 
@@ -14,13 +15,18 @@ Context context(&receiveState, &printState, &wifiInputState, &textInputState, &m
 
 using namespace global;
 
-void setup(){
-	Serial.begin(9600);
-		
+void initPins() {
 	pinMode(INP_BACK_PIN, INPUT_PULLUP);
 	pinMode(INP_LEFT_PIN, INPUT_PULLUP); 
 	pinMode(INP_MAIN_PIN, INPUT_PULLUP); 
 	pinMode(INP_RIGHT_PIN, INPUT_PULLUP); 
+}
+
+void setup(){
+	Serial.begin(global::BAUD_RATE); // TODO: CHANGE TO CORRECT NUM
+	initPins();	
+
+	context.receiverState = context.receiverState;
 
 	context.setState(context.menuState);
 
@@ -37,7 +43,11 @@ void setup(){
 	delay(150);
 
 	context.state->start();
+	command::lastPollTime = millis();
 }
 
 // Calls the current states handle method
-void loop() { context.handle(); }
+void loop() { 
+	command::poll();
+	context.handle(); 
+}

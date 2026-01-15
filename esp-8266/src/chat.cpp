@@ -5,55 +5,87 @@
 #include "command.hpp"
 
 namespace chat {	
-	const char* API_URL = "http://192.168.1.203:6512";
-	unsigned long lastPollTime;
-
 	ChatConfig config;
 
-	bool isApiInit = false;
-
-	// TODO: FIX THIS
-	bool initAPI() {
-		// snprintf(url, sizeof(url), "%s/Chat?unitGuid=%s", API_URL, UNIT_GUID);
-		// snprintf(bearerToken, sizeof(bearerToken), "Bearer %s", API_TOKEN);
-		config.isUrlSecure = wifi::isUrlSecured(config.url);
-		isApiInit = isConfigValid();
-		return isApiInit;
-	}
-
 	// TODO: STORE STATE ON ARDUINO, INCLUDING IF ITS SENT THE SIG THAT ITS READY TO RECEIVE
-	bool canPoll() {
-		return wifi::creds.connected 
-			&& controller::context.canReceive;
-			// && millis() - chat::lastPollTime > chat::POLL_INTERVAL;
-	}
+	bool canPoll() { return wifi::creds.connected; }
 
 	void onPollSuccess(HTTPClient& http, int httpCode) {
 		String payload = http.getString();
-		Serial.println(payload);
+		command::sendCommand("CHAT", payload.c_str());
 	}
 
-	void onPollError(HTTPClient& http, int httpCode) {
-		Serial.printf("HTTP GET failed, error: %s\n", http.errorToString(httpCode).c_str());
+	void genericOnError(HTTPClient& http, int httpCode) {
+		if (!LOGGING) return;
+		if (httpCode > 0) 
+			Serial.printf("HTTP Request failed with status: %d\n", httpCode);
+		 else 
+			Serial.printf("HTTP Request failed, error: %s\n", http.errorToString(httpCode).c_str());
 	}
 
-	void poll(bool log) {
+	void onPollError(HTTPClient& http, int httpCode) { genericOnError(http, httpCode); }
+
+	void initUrl(char url[URL_BUFF_SIZE], const char* path) {
+		strcpy(url, config.url);
+		strcat(url, path);
+	}
+
+	void addUrlParam(char* url, const char* name, const char* value, int& paramCount) {
+		const char* delim = paramCount > 0 ? "&" : "?";
+		strcat(url, delim);
+		strcat(url, name);
+		strcat(url, "=");
+		strcat(url, value);
+	}
+
+	void poll() {
 		using namespace wifi;
 
-		if (!isApiInit && !initAPI()) return;
+		Serial.println("ENTERED POLL FUNCTION");
+
+		if (!isConfigValid()) { 
+			command::sendCommand("CHAT_CONF_INVALID");
+			return;
+		}
 
 		RequestOptions options;
-		options.token = config.bearerToken;
+		options.isUrlSecure = isUrlSecured(config.url);
+		strcpy(options.token, config.bearerToken);
 		options.isAuthorized = true;
 
-		request(RequestType::GET, config.url, &options, onPollSuccess, onPollError);
-		
-		lastPollTime = millis();
+		char url[chat::URL_BUFF_SIZE];
+		int paramCount = 0;
+
+		initUrl(url, "/Chat");
+		addUrlParam(url, "unitGuid", config.unitGuid, paramCount);
+
+		request(RequestType::GET, url, &options, onPollSuccess, onPollError);
 	}
 
-	// TODO: SEND CHAT
-	void send() {
-		
+	void onSendSuccess(HTTPClient& http, int httpCode) { command::sendCommand("CHAT_SENT"); }
+
+	void onSendError(HTTPClient& http, int httpCode) { genericOnError(http, httpCode); }
+
+	void send(char buffer[URL_BUFF_SIZE]) {
+		using namespace wifi;
+
+		if (!isConfigValid()) { 
+			command::sendCommand("CHAT_CONF_INVALID");
+			return;
+		}
+
+		RequestOptions options;
+		options.isUrlSecure = isUrlSecured(config.url);
+		strcpy(options.token, config.bearerToken);
+		options.isAuthorized = true;
+
+		char url[chat::URL_BUFF_SIZE];
+		int paramCount = 0;
+
+		initUrl(url, "/Chat");
+		addUrlParam(url, "unitGuid", config.unitGuid, paramCount);
+
+		request(RequestType::POST, config.url, &options, onSendSuccess, onSendError);
 	}
 
 	bool isConfigValid() {

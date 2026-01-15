@@ -89,6 +89,7 @@ void Context::handle() {
 	checkButtonInput(state, actionButtonState, INP_MAIN_PIN, onActionClick, onActionHold, onActionDoubleClick);
 	checkButtonInput(state, rightButtonState, INP_RIGHT_PIN, onRightClick, onRightHold, onRightDoubleClick);
 
+	receiveState->handle();
 	state->handle(); 
 }
 

@@ -32,10 +32,7 @@ void setup() {
 	if (wifi::initCredsFromStorage()) wifi::connect(LOGGING);
 	chat::initConfigFromStorage();
 	
-	chat::initAPI();
-
 	wifi::secureClient.setInsecure(); // WARNING: Insecure, for testing only
-	chat::lastPollTime = millis();
 	Serial.println("Finished Setup!");
 }
 
