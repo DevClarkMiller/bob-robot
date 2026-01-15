@@ -56,4 +56,9 @@ namespace io {
 		// Return the total size needed for EEPROM
 		return storedDataAddrArr[STORED_DATA_SIZE - 1] + storedDataInfoArr[STORED_DATA_SIZE - 1].size;
 	}
+
+	void initStorage() {
+		size_t storedDataSize = initStoredDataAddresses();
+		EEPROM.begin(storedDataSize);
+	}
 }

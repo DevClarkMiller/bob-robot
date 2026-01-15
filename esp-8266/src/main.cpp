@@ -8,8 +8,6 @@
 #include "command.hpp"
 #include "io.hpp"
 
-unsigned long lastPollTime;
-
 using namespace io;
 
 // Order of stored items goes 
@@ -23,34 +21,25 @@ namespace io {
 	};
 }
 
-void initStorage() {
-	size_t storedDataSize = initStoredDataAddresses();
-	EEPROM.begin(storedDataSize);
-}
-
 void setup() {
 	Serial.begin(global::BAUD_RATE);
-	delay(250);
+	delay(50);
 
 	Serial.println("Starting ESP-8266...");
 
 	initStorage();
 
-	if (wifi::initCredsFromStorage()) wifi::connect(wifi::creds.ssid, wifi::creds.passwd, LOGGING);
+	if (wifi::initCredsFromStorage()) wifi::connect(LOGGING);
+	chat::initConfigFromStorage();
+	
 	chat::initAPI();
 
-	// TODO: LOAD CHAT FROM STORAGE
-
 	wifi::secureClient.setInsecure(); // WARNING: Insecure, for testing only
-	lastPollTime = millis();
-	Serial.println("Finished Setup");
+	chat::lastPollTime = millis();
+	Serial.println("Finished Setup!");
 }
 
 void loop() {
 	handleInput();
 	delay(1);
-	if (chat::canPoll() && millis() - lastPollTime > chat::POLL_INTERVAL) {
-		chat::poll(LOGGING);
-		lastPollTime = millis();
-	}
 }

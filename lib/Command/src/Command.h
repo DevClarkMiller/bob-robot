@@ -6,7 +6,6 @@ namespace command {
 	constexpr size_t CMD_NAME_BUFF_SIZE = 32;
 	constexpr char CMD_DELIM = ':';
 	constexpr char CMD_START_SYM = '$';
-
 	
 	typedef void (*CommandHandler)(char buffer[CMD_BUFF_SIZE]);
 

@@ -6,59 +6,27 @@
 namespace command {
 	void wifiStat(char buffer[CMD_BUFF_SIZE]) { sendCommand("WIFI_STAT", wifi::creds.connected ? "1" : "0"); }
 
-	void setCredentials(char buffer[CMD_BUFF_SIZE]) {
-		using namespace wifi;
-		const char* cmdName = "WIFI_STAT";
-
-		// Pull ssid and passwd buffers from the buffer since we already know their exact size
-		char ssidBuff[SSID_BUFF_SIZE];
-		char passwdBuff[PASSWD_BUFF_SIZE];
-
-		int j = 0;
-		// Copy over the ssid
-		for (int i = 0; i < SSID_BUFF_SIZE; i++) 
-			ssidBuff[i] = buffer[j++];
-
-		for (int i = 0; i < PASSWD_BUFF_SIZE; i++) 
-			passwdBuff[i] = buffer[j++];
-
-		// Copy over the passwd
-		strcpy(creds.ssid, ssidBuff);
-		strcpy(creds.passwd, passwdBuff);
-
-		if (connect(creds.ssid, creds.passwd, LOGGING)) {
-			writeCredsToStorage(); // Only actually save the creds if they're valid
-			sendCommand(cmdName, "1");
-		} else sendCommand(cmdName, "0");
-	}
-
 	void setToken(char buffer[CMD_BUFF_SIZE]) { strcpy(chat::config.bearerToken, buffer); }
 	void getToken(char buffer[CMD_BUFF_SIZE]) { sendCommand("TOKEN", chat::config.bearerToken); }; 
 
 	void setUnitGuid(char buffer[CMD_BUFF_SIZE]) { strcpy(chat::config.unitGuid, buffer); }
 	void getUnitGuid(char buffer[CMD_BUFF_SIZE]) { sendCommand("TOKEN", chat::config.unitGuid); }
 
-	void saveChatConfig(char buffer[CMD_BUFF_SIZE]) {
-		using namespace chat;
+	void pollChat(char buffer[CMD_BUFF_SIZE]) { if (chat::canPoll()) chat::poll(LOGGING); }
 
-		if (!isConfigValid()) { 
-			sendCommand("CHAT_CONFIG_INVALID", "1");
-			return;
-		}
-	
-		writeConfigToStorage();
+	// TODO: USE A PREPROCESSOR INSTEAD 
 
-		sendCommand("CHAT_SAVED", "1");
-	}
-
+	// TODO: USE AN ENUM INSTEAD TO SAVE ON MEMORY, OR USE A MACRO SOMEHOW
 	const Command COMMANDS[] = {
-		{"SET_WIFI_CREDS", setCredentials},
+		{"SET_WIFI_CREDS", wifi::setCredentials},
 		{"WIFI_STAT", wifiStat},
 		{"SET_TOKEN", setToken},
 		{"GET_TOKEN", getToken},
 		{"SET_UNIT_GUID", setUnitGuid},
 		{"GET_UNIT_GUID", getUnitGuid},
-		{"SAVE_CHAT_CONFIG", saveChatConfig}
+		{"SAVE_CHAT_CONFIG", chat::saveChatConfig},
+		{"POLL_CHAT", pollChat},
+		{""}
 	};
 
 	void handleCommand(char buffer[CMD_BUFF_SIZE]) {

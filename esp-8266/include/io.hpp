@@ -16,6 +16,8 @@ namespace io {
 	extern size_t storedDataAddrArr[STORED_DATA_SIZE];
 
 	void handleInput();
+	void initStorage();
+
 	size_t getStoredDataAddr(const char* name);
 	size_t initStoredDataAddresses();
 
