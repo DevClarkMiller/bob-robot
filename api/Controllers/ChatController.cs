@@ -42,10 +42,10 @@ public class ChatController : ControllerBase
 
 		switch (role) {
 			case Constants.Roles.Admin: return BadRequest("Admins have no incoming chats");
-			case Constants.Roles.Chatter: 
+			case Constants.Roles.Unit: 
 				_chatService.SendChatToChatter(unitGuid, message);
 				return Ok("Chat sent to Chatter");
-			case Constants.Roles.Unit:
+			case Constants.Roles.Chatter:
 				_chatService.SendChatToUnit(unitGuid, message);
 				return Ok("Chat sent to Unit");
 			default:
