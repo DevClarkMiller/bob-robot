@@ -1,8 +1,9 @@
-import './App.css'
+import './App.css';
 import { useSearchParams } from 'react-router-dom';
 
-import { Button } from './components/ui/button'
+import { Button } from './components/ui/button';
 import { useEffect, useMemo } from 'react';
+import ChatForm from './components/ChatForm';
 
 function App() {
 	const [searchParams] = useSearchParams();
@@ -12,14 +13,14 @@ function App() {
 	useEffect(() => {
 		if (!paramToken) return;
 
-		localStorage.setItem("token", paramToken);
+		localStorage.setItem('token', paramToken);
 	}, [paramToken]);
-	
+
 	return (
 		<>
-			<Button>Test</Button>
+			<ChatForm />
 		</>
-	)
+	);
 }
 
-export default App
+export default App;
