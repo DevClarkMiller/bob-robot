@@ -1,3 +1,4 @@
+using BobRobotApi.Config;
 using BobRobotApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -71,6 +72,9 @@ namespace helios.identity.api {
 
 			builder.Services.AddSingleton<ITokenService, TokenService>();
 			builder.Services.AddSingleton<IChatService, ChatService>();
+
+			// Options
+			builder.Services.AddOptions<ClientOptions>().Bind(builder.Configuration.GetSection("ClientOptions"));
 
             var app = builder.Build();
 

@@ -1,7 +1,10 @@
+using BobRobotApi.Config;
 using BobRobotApi.Models;
 using BobRobotApi.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Options;
 
 namespace BobRobotApi.Controllers;
 
@@ -13,15 +16,17 @@ public class TokenController : ControllerBase
     private readonly ILogger<ChatController> _logger;
 	private readonly ITokenService _tokenService;
 	private readonly string _adminTokenKey;
+	private readonly ClientOptions _clientOptions;
 
-    public TokenController(ILogger<ChatController> logger, ITokenService tokenService, IConfiguration config)
+    public TokenController(ILogger<ChatController> logger, ITokenService tokenService, IConfiguration config, IOptions<ClientOptions> clientOptions)
     {
         _logger = logger;
 		_tokenService = tokenService;
 		_adminTokenKey = config.GetSection("AppSettings").GetValue<string>("AdminTokenKey")!;
+		_clientOptions = clientOptions.Value;
     }
 
-	private async Task<IActionResult> CreateTokenGeneric(Guid? unitGuid, int tokenLifetime, string wantedRole) {
+	private async Task<IActionResult> CreateTokenGeneric(Guid? unitGuid, int tokenLifetime, string wantedRole, bool asUrl = false) {
 		var claims = await _tokenService.GetClaims(HttpContext);
 		bool isAdmin = _tokenService.GetRole(claims) == Constants.Roles.Admin;
 
@@ -29,6 +34,11 @@ public class TokenController : ControllerBase
 			return BadRequest($"Incorrect role for creating {wantedRole} tokens");
 
 		string token = _tokenService.CreateToken(unitGuid, wantedRole, tokenLifetime);
+		if (asUrl) { 
+			var param = new Dictionary<string, string?>() { { "token", token } };
+			token = new Uri(QueryHelpers.AddQueryString(_clientOptions.BaseUrl, param)).ToString();
+		}
+
 		return Ok(token);
 	}
 
@@ -38,7 +48,7 @@ public class TokenController : ControllerBase
 	}
 
 	[HttpPost("createChatterToken")]
-	public async Task<IActionResult> CreateChatterToken() 
+	public async Task<IActionResult> CreateChatterToken([FromQuery]bool asUrl = false) 
 		=> await CreateTokenGeneric(null, Constants.Token.TokenLifetime, Constants.Roles.Chatter);
 
 	[HttpPost("createAdminToken")]
