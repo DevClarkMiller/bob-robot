@@ -38,6 +38,7 @@ public class ChatService : IChatService
 	private async Task<string?> AIResponse(Chat chat) {
 		if (_geminiAgent == null) return null;
 
+		// TODO: REMOVE OLD MESSAGES ONCE THERE'S OVER 10!
 		var messages = chat.ChatHistory.Select(msg => 
 			msg.IsUser 
 				? new TextMessage(Role.User, msg.Message)
@@ -51,6 +52,7 @@ public class ChatService : IChatService
 		var resp = response.GetContent();
 
 		if (resp is null) return null;
+		resp = resp.Replace('\n', ' ');
 
 		chat.ChatHistory.Add(new ChatHistoryItem { IsUser = false, Message = resp });
 		return resp;
