@@ -1,0 +1,108 @@
+@Library('pipeline-lib') _
+
+pipeline {
+    agent any
+
+    parameters {
+        booleanParam(
+            name: 'All',
+            defaultValue: false,
+            description: 'Forces run even if there are no changes'
+        )
+        booleanParam(
+            name: 'Dev',
+            defaultValue: false,
+            description: 'Run dev even if there are no changes'
+        )
+        booleanParam(
+            name: 'Prod',
+            defaultValue: false,
+            description: 'Run prod even if there are no changes'
+        )
+        booleanParam(
+            name: 'UpdateNginx',
+            defaultValue: false,
+            description: 'Update nginx dev step even if there are no changes'
+        )
+    }
+
+    environment {
+        DIR = 'chatter'
+		SRC_DIR = "${DIR}/src/**"
+        USERNAME = credentials('vps-username')
+        DOMAIN = credentials('vps-domain')
+        PACKAGE = "${DIR}/package.json"
+        PACKAGE_LOCK = "${DIR}/package-lock.json"
+		PROD_DOMAIN = 'bob.qrcool.ca'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Install Dependencies') {
+            when {
+                anyOf {
+                    changeset SRC_DIR
+                    changeset PACKAGE
+                    changeset PACKAGE_LOCK
+                    expression { return params.All || params.Dev || params.Prod }
+                }
+            }
+            steps {
+                dir(DIR) { 
+                    sh 'npm install'
+                }
+            }
+        }
+
+        stage('Build Prod') {
+            when {
+                anyOf {
+                    changeset SRC_DIR
+                    changeset PACKAGE
+                    changeset PACKAGE_LOCK
+                    expression { return params.All || params.Prod }
+                }
+            }
+            steps {
+                dir(DIR) {
+                    sh 'npm run build'
+                }
+            }
+        }
+
+        stage('Deploy Prod') {
+            when {
+                anyOf {
+                    changeset SRC_DIR
+                    changeset PACKAGE
+                    changeset PACKAGE_LOCK
+                    expression { return params.All || params.Prod }
+                }
+            }
+            steps {
+                dir(DIR) {
+                    scpBuildFilesToWWW(USERNAME, DOMAIN, PROD_DOMAIN)
+                }
+            }
+        }
+
+        stage('Update Nginx Prod') {
+            when {
+                anyOf {
+                    changeset "${DIR}/nginx.prod.conf"
+                    expression { return params.All || (params.Prod && params.UpdateNginx) }
+                }
+            }
+            steps {
+                dir(DIR) {
+                    updateNginxConf(USERNAME, DOMAIN, PROD_DOMAIN, 'nginx.prod.conf')
+                }
+            }
+        }
+    }
+}

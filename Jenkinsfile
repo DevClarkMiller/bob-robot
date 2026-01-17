@@ -36,8 +36,7 @@ pipeline {
                 script {
                     def services = [
                         'bob-robot.api': 'api',
-                        // 'bob-robot.client': 'client',
-                        // 'bob-robot.data': 'data'
+                        'bob-robot.chatter': 'chatter',
                     ]
 
                     def toTrigger = []

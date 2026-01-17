@@ -35,7 +35,6 @@ pipeline {
         DOMAIN = credentials('vps-domain')
 		API_APP_SETTINGS = 'bob-robot.api'
 		IMAGE_NAME = 'bob-robot'
-		DEV = 'Development'
 		PROD = 'Production'
 		HOST = 'miller@sys1.clarkmiller.ca'
     }
@@ -51,7 +50,7 @@ pipeline {
             when {
 				anyOf {
 					changeset "${DIR}/**"
-					expression { return params.All || params.Dev || params.Prod }	
+					expression { return params.All || params.Prod }	
 				}
 			}
 			steps {
@@ -66,7 +65,7 @@ pipeline {
             when {
 				anyOf {
 					changeset "${DIR}/**"
-					expression { return params.All || params.Dev || params.Prod }	
+					expression { return params.All || params.Prod }	
 				}
 			}
 			steps {
@@ -75,24 +74,6 @@ pipeline {
 					buildDockerImage('Dockerfile', IMAGE_NAME, 'latest')
 				}
 			}
-        }
-
-        // DO THIS WHEN MULTIPLE SERVERS ARE PRESENT, ALSO FIND BETTER METHOD
-        // stage('Transfer docker image'){}
-
-        stage('Deploy Dev') {
-			when {
-				anyOf {
-					changeset "${DIR}/**"
-					expression { return params.All || params.Dev }
-				}
-			}
-            steps {
-				dir(DIR) { 
-					sh "scp docker-compose-dev.yml ${HOST}:/home/miller/bob-robot/dev/docker-compose.yml"
-                	sh "ssh ${HOST} \"cd bob-robot/dev && docker compose up -d\""
-				}
-            }
         }
 
 		stage('Deploy Prod') {
