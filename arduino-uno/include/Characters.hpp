@@ -7,12 +7,14 @@ extern byte bell[8];
 extern byte connect[8];
 extern byte question_mark[8];
 extern byte speaker[8];
+extern byte right_arrow[8];
 
 enum CharacterLocation {
 	Bell = 0,
 	Connect,
 	Question_Mark,
-	Speaker
+	Speaker,
+	Right_Arrow
 };
 
 void init_characters();

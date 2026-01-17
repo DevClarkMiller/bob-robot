@@ -35,6 +35,7 @@ namespace command {
 		{"GET_UNIT_GUID", getUnitGuid},
 		{"SAVE_CHAT_CONFIG", chat::saveChatConfig},
 		{"POLL_CHAT", pollChat},
+		{"SEND_CHAT", chat::send},
 		{"HELP", help}
 	};
 

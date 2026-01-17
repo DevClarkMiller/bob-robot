@@ -26,6 +26,11 @@ namespace wifi {
 		size_t tokenSize;
 
 		bool isAuthorized = false;
+
+		inline void noBody() {
+			body = nullptr;
+			bodySize = 0;
+		}
 	};
 
 	typedef void (*RequestCallback)(HTTPClient& http, int httpCode);

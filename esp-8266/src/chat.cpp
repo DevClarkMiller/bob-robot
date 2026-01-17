@@ -30,12 +30,41 @@ namespace chat {
 		strcat(url, path);
 	}
 
+	void urlEncode(const char* input, char* output, size_t outputSize) {
+		size_t outputIdx = 0;
+		for (size_t i = 0; input[i] != '\0' && outputIdx < outputSize - 1; i++) {
+			char c = input[i];
+			if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || 
+				(c >= '0' && c <= '9') || c == '-' || c == '_' || c == '.' || c == '~') {
+				// Safe characters - no encoding needed
+				output[outputIdx++] = c;
+			} else if (c == ' ') {
+				// Encode space as %20
+				if (outputIdx + 3 < outputSize) {
+					output[outputIdx++] = '%';
+					output[outputIdx++] = '2';
+					output[outputIdx++] = '0';
+				}
+			} else {
+				// Encode other characters as %HH
+				if (outputIdx + 3 < outputSize) {
+					outputIdx += sprintf(&output[outputIdx], "%%%02X", (unsigned char)c);
+				}
+			}
+		}
+		output[outputIdx] = '\0';
+	}
+
 	void addUrlParam(char* url, const char* name, const char* value, int& paramCount) {
 		const char* delim = paramCount > 0 ? "&" : "?";
+		char encodedValue[URL_BUFF_SIZE];
+		urlEncode(value, encodedValue, URL_BUFF_SIZE);
+
 		strcat(url, delim);
 		strcat(url, name);
 		strcat(url, "=");
-		strcat(url, value);
+		strcat(url, encodedValue);
+		paramCount++;
 	}
 
 	void poll() {
@@ -78,14 +107,20 @@ namespace chat {
 		options.isUrlSecure = isUrlSecured(config.url);
 		strcpy(options.token, config.bearerToken);
 		options.isAuthorized = true;
+		
+		options.noBody();
 
 		char url[chat::URL_BUFF_SIZE];
 		int paramCount = 0;
 
 		initUrl(url, "/Chat");
 		addUrlParam(url, "unitGuid", config.unitGuid, paramCount);
+		addUrlParam(url, "message", buffer, paramCount);
 
-		request(RequestType::POST, config.url, &options, onSendSuccess, onSendError);
+		Serial.println(url);
+		Serial.println(buffer);
+
+		request(RequestType::POST, url, &options, onSendSuccess, onSendError);
 	}
 
 	bool isConfigValid() {

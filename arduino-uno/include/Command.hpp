@@ -9,4 +9,7 @@ namespace command {
 	bool canPoll();
 	// Send a poll command to the ESP-8266
 	void poll();
+
+	void handleCommand(char buffer[CMD_BUFF_SIZE]);
+	void sendChat(char buffer[CMD_BUFF_SIZE]);
 } 

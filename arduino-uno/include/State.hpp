@@ -1,5 +1,6 @@
 #pragma once
 #include "Arduino.h"
+#include <Command.h>
 
 struct Context;
 
@@ -38,13 +39,16 @@ struct ReceiveState: State {
 };
 
 struct PrintState: State {
-	PrintState(String* msg): msg(msg) {}
+	State* prevState;
 
+	void copyIntoMsgBuffer(char buffer[command::CMD_BUFF_SIZE]);
+
+	void start() override;
 	void handle() override;
 	const char* name() const override { return "Print"; };
 
 private:
-	String* msg;
+	char msgBuffer[command::CMD_BUFF_SIZE];
 };
 
 struct WifiInputState: State {

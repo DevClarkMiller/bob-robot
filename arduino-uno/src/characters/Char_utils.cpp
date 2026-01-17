@@ -9,4 +9,5 @@ void init_characters() {
 	lcd.createChar((int)CharacterLocation::Connect, connect);
 	lcd.createChar((int)CharacterLocation::Question_Mark, question_mark);
 	lcd.createChar((int)CharacterLocation::Speaker, speaker);
+	lcd.createChar((int)CharacterLocation::Right_Arrow, right_arrow);
 }

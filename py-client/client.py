@@ -1,4 +1,4 @@
-import serial, time, argparse, threading
+import serial, time, argparse, threading, os
 
 LAST_ACT_MS_THRESHOLD = 1500 # 
 
@@ -7,6 +7,7 @@ baud = None
 quit_event = threading.Event()
 arduino = None
 
+def clear(): os.system('cls' if os.name == 'nt' else 'clear')
 def stop(): quit_event.set()
 
 def get_serial(com, baud):
@@ -33,6 +34,9 @@ def writeSerial():
             if msg == "exit":
                 stop()
                 break
+            elif msg == "clear": 
+                clear()
+                continue
             write(msg)
         except Exception as e:
             print(e)

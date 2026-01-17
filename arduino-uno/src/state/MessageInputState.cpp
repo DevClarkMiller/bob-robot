@@ -1,12 +1,17 @@
 #include "Global.hpp"
 #include "State.hpp"
 #include "Context.hpp"
+#include "Command.hpp"
 
 using namespace global;
 
 // TODO: Send message over wifi chip
 void MessageInputState::sendMessage() {
-	print_to_screen("Sent message!");
+	char buffer[command::CMD_BUFF_SIZE];
+	strcpy(buffer, strInp.c_str());
+
+	command::sendChat(buffer);
+	print_to_screen("Chat Sent!");
 	delay(1000);
 }
 

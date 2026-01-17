@@ -22,6 +22,10 @@ function App() {
 		navigate({ search: '' }, { replace: true });
 	}, [navigate, paramToken]);
 
+	// TODO: ADD TOGGLE TO MAKE CHATGPT RESPOND TO CHATS INSTEAD WHEN I DONT FEEL LIKE IT
+	// so add a new controller, add route to toggle chat gpt, when chats come in, check if chatgpt
+	// is toggled, if so respond right away, else add to queue
+
 	return (
 		<div className="h-screen w-screen flex flex-col justify-center gap-2 text-center">
 			<h1 className="font-bold text-lg mb-5">Bot the Robot Chatter</h1>

@@ -3,10 +3,8 @@
 #include "Characters.hpp"
 #include "Command.hpp"
 
-String msg;
-
 ReceiveState receiveState;
-PrintState printState(&msg);
+PrintState printState;
 WifiInputState wifiInputState;
 TextInputState textInputState;
 MessageInputState messageInputState;
@@ -39,7 +37,6 @@ void setup(){
 
 	lcd.setCursor(0, 0);
 	lcd.print("Waiting...");
-	makeReadyToReceive();
 	delay(150);
 
 	context.state->start();

@@ -12,15 +12,13 @@ struct MenuOption {
 };
 
 MenuOption menuOptions[] = { 
-	{ nullptr, CharacterLocation::Speaker},
-	{ nullptr, CharacterLocation::Question_Mark},
+	{ nullptr, CharacterLocation::Right_Arrow},
 	{ nullptr, CharacterLocation::Connect }
 };
 
 void Context::initMenu(){
-	menuOptions[0].state = this->receiveState;
-	menuOptions[1].state = this->messageInputState;
-	menuOptions[2].state = this->wifiInputState;
+	menuOptions[0].state = this->messageInputState;
+	menuOptions[1].state = this->wifiInputState;
 }
 
 int numMenuOpts() { return sizeof(menuOptions) / sizeof(MenuOption); }

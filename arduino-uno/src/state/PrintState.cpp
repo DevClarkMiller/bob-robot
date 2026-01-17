@@ -4,13 +4,12 @@
 
 using namespace global;
 
+void PrintState::copyIntoMsgBuffer(char buffer[command::CMD_BUFF_SIZE]) { strcpy(msgBuffer, buffer); }
+
+void PrintState::start() { }
+
 void PrintState::handle() {
-  	// wait a bit for the entire message to arrive
-    delay(100);
     // read all the available characters
-    *msg = Serial.readString(); 
-    print_to_screen(*msg);
-	// Once message is completely outputted, make system receivable again
-    makeReadyToReceive();
-	ctx->setState(ctx->receiveState);
-  }
+    print_to_screen(msgBuffer);
+	ctx->setState(prevState);
+}

@@ -9,12 +9,6 @@ namespace io {
 	bool StoredData::isStored() { return magic == RAW_DATA_HEALTH_ID; }
 	void StoredData::init() { magic = RAW_DATA_HEALTH_ID; }
 
-	void copySerialInfoBuffer(char* buffer, size_t buffsize) {
-		size_t len = Serial.readBytesUntil('\n', buffer, buffsize - 1);
-		buffer[len] = '\0';
-		if (len > 0 && buffer[len - 1] == '\r') buffer[len - 1] = '\0';
-	}
-
 	void handleInput() {
 		using namespace command;
 

@@ -40,6 +40,11 @@ public:
 		state->start(); 
 	}
 
+	void setReceiverState(State* s) {
+		receiverState = s;
+		receiverState->start();
+	}
+
 	void start() { state->start(); }
 	void handle();
 	void initMenu();
@@ -50,3 +55,5 @@ private:
 	ButtonState actionButtonState;
 	ButtonState rightButtonState;
 };
+
+extern Context context;
