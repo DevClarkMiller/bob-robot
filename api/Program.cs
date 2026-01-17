@@ -75,6 +75,7 @@ namespace helios.identity.api {
 
 			// Options
 			builder.Services.AddOptions<ClientOptions>().Bind(builder.Configuration.GetSection("ClientOptions"));
+			builder.Services.AddOptions<GeminiApiConfig>().Bind(builder.Configuration.GetSection("GeminiApiConfig"));
 
             var app = builder.Build();
 

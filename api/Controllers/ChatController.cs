@@ -21,7 +21,7 @@ public class ChatController : ControllerBase
     }
 
 	[HttpGet("getAll")]
-	public async Task<IActionResult> GetAllChats(Guid unitGuid) {
+	public IActionResult GetAllChats(Guid unitGuid) {
 		var chats = _chatService.GetAllChats(unitGuid);
 		return Ok(chats);
 	}
@@ -44,7 +44,7 @@ public class ChatController : ControllerBase
 	[HttpPut("isUsingAIChats")]
 	public IActionResult IsUsingAIChats([FromQuery] Guid unitGuid, [FromQuery] bool state) {
 		_chatService.SetIsUsingAIChats(unitGuid, state);
-		return Ok("Set IsUsingAIChats");
+		return Ok();
 	}
 
 	[HttpGet("isUsingAIChats")]
@@ -59,7 +59,7 @@ public class ChatController : ControllerBase
 		switch (role) {
 			case Constants.Roles.Admin: return BadRequest("Admins have no incoming chats");
 			case Constants.Roles.Unit: 
-				_chatService.SendChatToChatter(unitGuid, message);
+				await _chatService.SendChatToChatter(unitGuid, message);
 				return Ok("Chat sent to Chatter");
 			case Constants.Roles.Chatter:
 				_chatService.SendChatToUnit(unitGuid, message);
