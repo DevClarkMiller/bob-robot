@@ -21,6 +21,12 @@ public class ChatController : ControllerBase
     }
 
 	[HttpGet]
+	public async Task<IActionResult> GetAllChats(Guid unitGuid) {
+		var chats = _chatService.GetAllChats(unitGuid);
+		return Ok(chats);
+	}
+
+	[HttpGet]
 	public async Task<IActionResult> GetChat(Guid unitGuid) {
 		var claims = await _tokenService.GetClaims(HttpContext);
 		var role = _tokenService.GetRole(claims);

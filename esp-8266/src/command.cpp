@@ -13,7 +13,7 @@ namespace command {
 	void getUrl(char buffer[CMD_BUFF_SIZE]) { sendCommand("URL", chat::config.url); };
 
 	void setUnitGuid(char buffer[CMD_BUFF_SIZE]) { strcpy(chat::config.unitGuid, buffer); }
-	void getUnitGuid(char buffer[CMD_BUFF_SIZE]) { sendCommand("TOKEN", chat::config.unitGuid); }
+	void getUnitGuid(char buffer[CMD_BUFF_SIZE]) { sendCommand("UNIT_GUID", chat::config.unitGuid); }
 
 	void pollChat(char buffer[CMD_BUFF_SIZE]) { 
 		if (chat::canPoll()) chat::poll(); 

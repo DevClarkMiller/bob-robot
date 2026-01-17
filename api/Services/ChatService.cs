@@ -15,6 +15,8 @@ public class ChatService : IChatService
 		return toUnit ? chat.UnitMessages : chat.ChatterMessages;
 	}
 
+	public Chat GetAllChats(Guid unitGuid) => GetOrInitChat(unitGuid);
+
 	private string? GetChat(Guid unitGuid, bool toUnit) {
 		var chatQueue = GetChatQueue(unitGuid, toUnit);
 		return chatQueue.Count > 0 ? chatQueue.Dequeue() : null;
@@ -34,6 +36,7 @@ public class ChatService : IChatService
 
 public interface IChatService
 {
+	public Chat GetAllChats(Guid unitGuid);
 	public string? GetUnitChats(Guid unitGuid);
 	public string? GetChatterChats(Guid unitGuid);
 	public void SendChatToUnit(Guid unitGuid, string message);
