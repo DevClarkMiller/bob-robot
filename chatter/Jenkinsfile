@@ -100,7 +100,7 @@ pipeline {
             }
             steps {
                 dir(DIR) {
-                    updateNginxConf(USERNAME, DOMAIN, PROD_DOMAIN, 'nginx.prod.conf')
+                    updateNginxConf(USERNAME, DOMAIN, PROD_DOMAIN, 'nginx.prod.conf', false)
                 }
             }
         }
