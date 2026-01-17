@@ -19,7 +19,6 @@ void MessageInputState::start() {
 	State::start();
 
 	if (strInp.length() > 0) { // Means message has been inputted
-	 	Serial.println(strInp); // Send message over serial
 		print_to_screen(strInp);
 		delay(500);
 		sendMessage();

@@ -17,7 +17,7 @@ namespace command {
 
 	void pollChat(char buffer[CMD_BUFF_SIZE]) { 
 		if (chat::canPoll()) chat::poll(); 
-		else sendCommand("POLL_FAIL", "Not connected to network");
+		else if (LOGGING) sendCommand("POLL_FAIL", "Not connected to network");
 	}
 
 	// TODO: USE AN ENUM INSTEAD TO SAVE ON MEMORY, OR USE A MACRO SOMEHOW
@@ -55,6 +55,6 @@ namespace command {
 		int n = sizeof(COMMANDS) / sizeof(Command);
 		const Command* cmd = command::getCommand(cmdNameBuff, COMMANDS, n);
 		if (cmd != nullptr) cmd->handler(buffer);
-		else sendCommand("CMD_404", "1");
+		else if(LOGGING) sendCommand("CMD_404", "1");
 	}
 }

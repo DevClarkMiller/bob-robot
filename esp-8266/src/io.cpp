@@ -24,10 +24,7 @@ namespace io {
 			char buffer[CMD_BUFF_SIZE];
 			copySerialInfoBuffer(buffer, CMD_BUFF_SIZE);
 			handleCommand(buffer);
-		} else {
-			Serial.println("Data received isn't a CMD");
-			Serial.println(Serial.readString());
-		}
+		} else util::clearSerial();
 
 		// TODO: Handle other input types
 	}

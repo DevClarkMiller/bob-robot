@@ -1,6 +1,7 @@
 #include "Global.hpp"
 #include "State.hpp"
 #include "Context.hpp"
+#include "Command.hpp"
 
 using namespace global;
 
@@ -10,9 +11,10 @@ void prompt(const char* msg) {
 }
 
 // TODO: SEND CREDENTIALS TO WIFI CHIP, CHECK IF SUCCESS, THEN STORE IN FLASH IF SO
-bool WifiInputState::transferCredentials() {
-	// Listen for response from wifi chip
-	return true; // PLACEHOLDER
+void WifiInputState::transferCredentials() {
+	command::sendCommand("SET_SSID", ctx->ssid.c_str());
+	command::sendCommand("SET_PASSWD", ctx->passwd.c_str());
+	command::sendCommand("SAVE_WIFI_CREDS");
 }
 
 void WifiInputState::start() {
@@ -24,13 +26,9 @@ void WifiInputState::start() {
 	} else if (ctx->passwd.length() == 0) {
 		prompt("Enter Password");
 		outputString = &ctx->passwd;
-	}else if (transferCredentials()) {
-		print_to_screen("Successfully connected to wifi");
-		// No go back to main menu
-		State::onBackHold();
-	}else { // Means transfering credentials failed
-		print_to_screen("Failed to connect to wifi");
 	}
+	
+	transferCredentials();
 	
 	ctx->textInputState->prevState = this;
 	ctx->textInputState->outputString = outputString;

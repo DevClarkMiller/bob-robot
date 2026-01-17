@@ -3,5 +3,5 @@
 #include "Arduino.h"
 
 namespace global {
-	#define LOGGING true	
+	#define LOGGING false	
 }

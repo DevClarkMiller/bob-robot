@@ -32,6 +32,13 @@ public class ChatService : IChatService
 
 	public void SendChatToUnit(Guid unitGuid, string message) => SendChat(unitGuid, message, true);
 	public void SendChatToChatter(Guid unitGuid, string message) => SendChat(unitGuid, message, false);
+
+	public void SetIsUsingAIChats(Guid unitGuid, bool value) {
+		var chat = GetOrInitChat(unitGuid);
+		chat.IsUsingAIChats = value;
+	}
+
+	public bool GetIsUsingAIChats(Guid unitGuid) => GetOrInitChat(unitGuid).IsUsingAIChats;
 }
 
 public interface IChatService
@@ -41,4 +48,6 @@ public interface IChatService
 	public string? GetChatterChats(Guid unitGuid);
 	public void SendChatToUnit(Guid unitGuid, string message);
 	public void SendChatToChatter(Guid unitGuid, string message);
+	public void SetIsUsingAIChats(Guid unitGuid, bool value);
+	public bool GetIsUsingAIChats(Guid unitGuid);
 }

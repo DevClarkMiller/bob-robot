@@ -3,18 +3,15 @@
 #include "Context.hpp"
 #include "Command.hpp"
 #include <Io.h>
+#include <Util.h>
 
 using namespace global;
 
 void ReceiveState::onBackHold() {
 	ctx->setState(ctx->menuState);
-	ctx->start();
 }
 
-void ReceiveState::start() {
-	print_to_screen("Listening for messages...");
-}
-
+void ReceiveState::start() { State::start(); }
 
 void ReceiveState::handle() {
 	using namespace command;
@@ -30,8 +27,5 @@ void ReceiveState::handle() {
 		char buffer[CMD_BUFF_SIZE];
 		io::copySerialInfoBuffer(buffer, CMD_BUFF_SIZE);
 		command::handleCommand(buffer);
-	} else {
-		Serial.println("Data received isn't a CMD");
-		Serial.println(Serial.readString());
-	}
+	} else util::clearSerial();
 }

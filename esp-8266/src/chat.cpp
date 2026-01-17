@@ -70,8 +70,6 @@ namespace chat {
 	void poll() {
 		using namespace wifi;
 
-		Serial.println("ENTERED POLL FUNCTION");
-
 		if (!isConfigValid()) { 
 			command::sendCommand("CHAT_CONF_INVALID");
 			return;
@@ -116,9 +114,6 @@ namespace chat {
 		initUrl(url, "/Chat");
 		addUrlParam(url, "unitGuid", config.unitGuid, paramCount);
 		addUrlParam(url, "message", buffer, paramCount);
-
-		Serial.println(url);
-		Serial.println(buffer);
 
 		request(RequestType::POST, url, &options, onSendSuccess, onSendError);
 	}

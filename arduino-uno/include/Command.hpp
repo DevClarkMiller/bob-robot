@@ -2,7 +2,7 @@
 #include <Command.h>
 
 namespace command {
-	constexpr size_t POLL_INTERVAL = 5000;
+	constexpr size_t POLL_INTERVAL = 10000;
 
 	extern unsigned long lastPollTime;
 

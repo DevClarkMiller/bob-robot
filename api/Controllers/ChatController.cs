@@ -41,6 +41,16 @@ public class ChatController : ControllerBase
 		return Ok(chat);
 	}
 
+	[HttpPut("isUsingAIChats")]
+	public IActionResult IsUsingAIChats([FromQuery] Guid unitGuid, [FromQuery] bool state) {
+		_chatService.SetIsUsingAIChats(unitGuid, state);
+		return Ok("Set IsUsingAIChats");
+	}
+
+	[HttpGet("isUsingAIChats")]
+	public IActionResult IsUsingAIChats([FromQuery] Guid unitGuid)
+		=> Ok(_chatService.GetIsUsingAIChats(unitGuid));
+
 	[HttpPost]
 	public async Task<IActionResult> SendChat([FromQuery] Guid unitGuid, [FromQuery] string message) {
 		var claims = await _tokenService.GetClaims(HttpContext);

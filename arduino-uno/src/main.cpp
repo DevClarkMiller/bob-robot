@@ -24,7 +24,7 @@ void setup(){
 	Serial.begin(global::BAUD_RATE); // TODO: CHANGE TO CORRECT NUM
 	initPins();	
 
-	context.receiverState = context.receiverState;
+	context.receiverState = context.receiveState;
 
 	context.setState(context.menuState);
 

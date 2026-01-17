@@ -3,6 +3,8 @@
 #include "Global.hpp"
 #include "Context.hpp"
 
+using namespace global;
+
 namespace command {
 	unsigned long lastPollTime;
 
@@ -20,12 +22,21 @@ namespace command {
 		context.printState->copyIntoMsgBuffer(buffer);
     	context.setState(context.printState);
 	}
+	
+	void onWifiStat(char buffer[CMD_BUFF_SIZE]) {
+		print_to_screen(buffer[0] == '1' ? 
+			"Successfully connected to wifi" : "Failed to connect to wifi");
+		
+		delay(1000);
+		context.state->onBackHold();
+	} 
 
 	// Sends chat to the ESP-8266 which then sends it to the server
 	void sendChat(char buffer[CMD_BUFF_SIZE]) { sendCommand("SEND_CHAT", buffer); }
 
 	const Command COMMANDS[] = {
-		{"CHAT", onChat}
+		{"CHAT", onChat},
+		{"WIFI_STAT", onWifiStat}
 	};
 
 	void handleCommand(char buffer[CMD_BUFF_SIZE]) {
@@ -35,6 +46,6 @@ namespace command {
 		int n = sizeof(COMMANDS) / sizeof(Command);
 		const Command* cmd = command::getCommand(cmdNameBuff, COMMANDS, n);
 		if (cmd != nullptr) cmd->handler(buffer);
-		else sendCommand("CMD_404", "1");
+		// else if () sendCommand("CMD_404", "1");
 	}
 }

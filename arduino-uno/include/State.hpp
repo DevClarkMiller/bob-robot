@@ -57,7 +57,7 @@ struct WifiInputState: State {
 	const char* name() const override { return "WifiInput"; };
 
 private:
-	bool transferCredentials();
+	void transferCredentials();
 };
 
 struct TextInputState: State {
