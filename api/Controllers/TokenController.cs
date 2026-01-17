@@ -49,7 +49,7 @@ public class TokenController : ControllerBase
 
 	[HttpPost("createChatterToken")]
 	public async Task<IActionResult> CreateChatterToken([FromQuery]bool asUrl = false) 
-		=> await CreateTokenGeneric(null, Constants.Token.TokenLifetime, Constants.Roles.Chatter);
+		=> await CreateTokenGeneric(null, Constants.Token.TokenLifetime, Constants.Roles.Chatter, asUrl);
 
 	[HttpPost("createAdminToken")]
 	[AllowAnonymous]

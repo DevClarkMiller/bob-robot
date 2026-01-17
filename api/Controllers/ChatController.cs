@@ -20,7 +20,7 @@ public class ChatController : ControllerBase
 		_tokenService = tokenService;
     }
 
-	[HttpGet("/getAll")]
+	[HttpGet("getAll")]
 	public async Task<IActionResult> GetAllChats(Guid unitGuid) {
 		var chats = _chatService.GetAllChats(unitGuid);
 		return Ok(chats);
