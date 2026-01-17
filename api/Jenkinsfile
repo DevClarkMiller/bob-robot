@@ -55,7 +55,6 @@ pipeline {
 			}
 			steps {
                 dir(DIR) {
-                    loadAppsettings(API_APP_SETTINGS, DEV)
                     loadAppsettings(API_APP_SETTINGS, PROD)
                 }
             }
