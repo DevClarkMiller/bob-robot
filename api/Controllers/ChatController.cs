@@ -6,7 +6,7 @@ namespace BobRobotApi.Controllers;
 
 [Authorize]
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class ChatController : ControllerBase
 {
     private readonly ILogger<ChatController> _logger;
