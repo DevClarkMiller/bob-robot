@@ -10,7 +10,11 @@ import { poster } from 'helios-utilities-sdk';
 import { BaseApiUrl } from '@/Constants';
 import { swapAndFetchToken } from '@/helpers/TokenHelper';
 
-const ChatForm = () => {
+export interface ChatFormProps {
+	unitGuid: string;
+}
+
+const ChatForm = ({ unitGuid }: ChatFormProps) => {
 	const formSchema = z.object({
 		message: z
 			.string()
@@ -31,6 +35,7 @@ const ChatForm = () => {
 		const url = new URL(route);
 
 		url.searchParams.append('message', values.message);
+		url.searchParams.append('unitGuid', unitGuid);
 
 		const oldToken = swapAndFetchToken('chatterToken');
 		await poster(url, null, true);

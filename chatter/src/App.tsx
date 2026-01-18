@@ -34,7 +34,7 @@ const Home = ({ isLoading, isUsingAIChats, unitGuid, setUnitGuid, onChangeIsUsin
 				<MessageViewer unitGuid={unitGuid} />
 			</div>
 			<div className="w-100 mx-auto">
-				<ChatForm />
+				<ChatForm unitGuid={unitGuid} />
 			</div>
 		</>
 	);
@@ -74,7 +74,7 @@ function App() {
 	return (
 		<div className="h-screen w-screen flex flex-col justify-center gap-2 text-center">
 			<Routes>
-				<Route path="/keyboard" element={<UnitKeyboard />} />
+				<Route path="/keyboard" element={<UnitKeyboard unitGuid={unitGuid} />} />
 				<Route
 					path="/"
 					element={

@@ -9,7 +9,11 @@ import { BaseApiUrl } from '@/Constants';
 import { poster } from 'helios-utilities-sdk';
 import { swapAndFetchToken } from '@/helpers/TokenHelper';
 
-const UnitKeyboard = () => {
+export interface UnitKeyboardProps {
+	unitGuid: string;
+}
+
+const UnitKeyboard = ({ unitGuid }: UnitKeyboardProps) => {
 	const formSchema = z.object({
 		message: z
 			.string()
@@ -30,6 +34,7 @@ const UnitKeyboard = () => {
 		const url = new URL(route);
 
 		url.searchParams.append('message', values.message);
+		url.searchParams.append('unitGuid', unitGuid);
 
 		const oldToken = swapAndFetchToken('unitToken');
 		await poster(url, null, true);

@@ -1,4 +1,5 @@
 import { BaseApiUrl, POLL_INTERVAL_MS } from '@/Constants';
+import { swapAndFetchToken } from '@/helpers/TokenHelper';
 import type { MessageType } from '@/models/MessageType';
 import { fetcher } from 'helios-utilities-sdk';
 import { useCallback, useEffect, useState } from 'react';
@@ -13,7 +14,10 @@ const useMessagePolling = (unitGuid: string): MessageType[] => {
 		// FIX FETCHER
 		try {
 			console.log(url.toString());
+
+			const oldToken = swapAndFetchToken('chatterToken');
 			const resp = await fetcher<string>(url, true);
+			localStorage.setItem('token', oldToken);
 			if (!resp || resp.error || !resp.data) return;
 
 			if (resp.data == 'No chats queued up') return;
