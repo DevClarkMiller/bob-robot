@@ -11,7 +11,7 @@ function App() {
 	const navigate = useNavigate();
 	const [searchParams] = useSearchParams();
 
-	const { isUsingAIChats, unitGuid, setUnitGuid, onChangeIsUsingAIChats } = useSettings();
+	const { isLoading, isUsingAIChats, unitGuid, setUnitGuid, onChangeIsUsingAIChats } = useSettings();
 	const paramToken = useMemo(() => searchParams.get('token'), [searchParams]);
 
 	useEffect(() => {
@@ -30,6 +30,7 @@ function App() {
 			<h1 className="font-bold text-lg mb-5">Bot the Robot Chatter</h1>
 			<div className="w-100 mx-auto">
 				<SettingsInput
+					isLoading={isLoading}
 					isUsingAIChats={isUsingAIChats}
 					unitGuid={unitGuid}
 					setUnitGuid={setUnitGuid}

@@ -2,15 +2,18 @@ import { useEffect, useState } from 'react';
 import useStoredField from './useStoredField';
 import { fetcher, putter } from 'helios-utilities-sdk';
 import { BaseApiUrl } from '@/Constants';
+import { isGuidValid } from '@/helpers/GuidHelper';
 
 const useSettings = () => {
 	const { value: unitGuid, setValue: setUnitGuid } = useStoredField('unitGuid');
 
 	const [isUsingAIChats, setIsUsingAIChats] = useState(false);
+	const [isLoading, setIsLoading] = useState(true);
 
 	useEffect(() => {
 		(async () => {
-			if (!unitGuid) return;
+			if (!unitGuid || !isGuidValid(unitGuid)) return;
+			setIsLoading(true);
 
 			const url = new URL(`${BaseApiUrl}/Chat/isUsingAIChats`);
 			url.searchParams.append('unitGuid', unitGuid);
@@ -18,6 +21,7 @@ const useSettings = () => {
 			const resp = await fetcher(url, true);
 			console.log(resp.data);
 			if (resp.data) setIsUsingAIChats(resp.data == 'true');
+			setIsLoading(false);
 		})();
 	}, [unitGuid]);
 
@@ -30,7 +34,7 @@ const useSettings = () => {
 		setIsUsingAIChats(state);
 	};
 
-	return { isUsingAIChats, unitGuid, setUnitGuid, onChangeIsUsingAIChats };
+	return { isLoading, isUsingAIChats, unitGuid, setUnitGuid, onChangeIsUsingAIChats };
 };
 
 export default useSettings;
