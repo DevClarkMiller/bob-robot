@@ -3,3 +3,4 @@ api/bin
 api/appsettings.Development.json
 api/appsettings.Production.json
 esp-8266/src/main.cpp
+py-cli-tools/.env
