@@ -88,7 +88,6 @@ public class ChatService : IChatService
 			var newMessage = await AIResponse(chat);
 			if (newMessage is not null) { 
 				SendChatToUnit(unitGuid, newMessage);
-				chat.ChatterMessages.Dequeue();
 				if (chat.ChatterMessages.Count > 0) {
 					chat.ChatterMessages.Dequeue();
 				}
