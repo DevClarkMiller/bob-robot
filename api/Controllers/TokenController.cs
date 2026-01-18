@@ -1,5 +1,4 @@
 using BobRobotApi.Config;
-using BobRobotApi.Models;
 using BobRobotApi.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
